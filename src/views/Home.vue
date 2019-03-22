@@ -1,12 +1,19 @@
 <template>
 <div>
-  <h1>This is the home page</h1>
+  <Parallax />
+  <OpenEvents />
 </div>
 </template>
 
 <script>
+import Parallax from "@/components/Parallax.vue";
+import OpenEvents from "@/components/OpenEvents.vue";
+
 export default {
   name: "home",
-  components: {}
+  components: {
+    Parallax,
+    OpenEvents
+  }
 };
 </script>
