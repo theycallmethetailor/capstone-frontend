@@ -6,6 +6,7 @@ import store from './store';
 import 'vuetify/dist/vuetify.min.css';
 import colors from 'vuetify/es5/util/colors'
 
+
 Vue.use(Vuetify, {
   theme: {
     primary: colors.teal.lighten1,

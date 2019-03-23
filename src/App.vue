@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <NavDrawer />
     <NavigationComp />
     <v-content>
       <v-container fluid>
@@ -12,10 +13,12 @@
 
 <script>
 import NavigationComp from "@/components/NavigationComp.vue";
+import NavDrawer from "@/components/NavDrawer.vue";
 
 export default {
   components: {
-    NavigationComp
+    NavigationComp,
+    NavDrawer
   }
 };
 </script>

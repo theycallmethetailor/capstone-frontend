@@ -7,6 +7,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    drawer: false,
     openEvents: [],
     //READ events
     fetchingEvents: false,
@@ -74,6 +75,9 @@ export default new Vuex.Store({
     cancelShiftSuccess: false,
   },
   mutations: {
+    toggleDrawer(state) {
+      state.drawer = !state.drawer
+    },
     //READ events
     fetchingEvents(state) {
       state.fetchEventsError = false
@@ -301,6 +305,9 @@ export default new Vuex.Store({
 
   },
   actions: {
+    toggleDrawer({ commit }) {
+      commit("toggleDrawer")
+    },
     //READ events
     getOpenEvents({ commit }) {
       commit("fetchingEvents")
@@ -384,7 +391,7 @@ export default new Vuex.Store({
     },
     //READ NPO
     getNPOs({ commit }, npoID) {
-      commit("fetchingNPOss")
+      commit("fetchingNPOs")
       axios.get(`http://localhost:8081/api/npos`)
         .then(response => {
           console.log("getNPO action response: ", response)
