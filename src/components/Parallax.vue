@@ -1,5 +1,6 @@
 <template>
   <v-parallax
+    xs12
     dark
     src="/assets/care-caregiver-deal-45842.jpg"
   >

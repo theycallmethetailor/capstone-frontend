@@ -12,6 +12,11 @@ export default new Vuex.Store({
     fetchingEvents: false,
     fetchEventsError: false,
     fetchEventsSuccess: false,
+    //READ event (SHOW)
+    event: {},
+    fetchEvent: false,
+    fetchEventError: false,
+    fetchEventSuccess: false,
     //CREATE event
     addingEvent: false,
     addEventError: false,
@@ -21,10 +26,10 @@ export default new Vuex.Store({
     updateEventError: false,
     updateEventSuccess: false,
     //READ NPO
-    npo: {},
-    fetchingNPO: false,
-    fetchNPOError: false,
-    fetchNPOSuccess: false,
+    npos: [],
+    fetchingNPOs: false,
+    fetchNPOsError: false,
+    fetchNPOsSuccess: false,
     //CREATE NPO
     addingNPO: false,
     addNPOError: false,
@@ -50,6 +55,23 @@ export default new Vuex.Store({
     updatingVolunteer: false,
     updateVolunteerError: false,
     updateVolunteerSuccess: false,
+    //DELETE Volunteer
+    deletingVolunteer: false,
+    deleteVolunteerError: false,
+    deleteVolunteerSuccess: false,
+    //READ all volunteer shifts
+    volunteerShifts: [],
+    fetchingVolShifts: false,
+    fetchVolShiftsError: false,
+    fetchVolShiftsSuccess: false,
+    //UPDATE Shift - Volunteer Shift Signup
+    signingUpShift: false,
+    signUpShiftError: false,
+    signUpShiftSuccess: false,
+    //UPDATE Shift - Volunteer Shift Cancel
+    cancelingShift: false,
+    cancelShiftError: false,
+    cancelShiftSuccess: false,
   },
   mutations: {
     //READ events
@@ -66,6 +88,21 @@ export default new Vuex.Store({
       state.fetchingEvents = false
       state.fetchEventsSuccess = true
       state.openEvents = openEvents
+    },
+    //READ event (SHOW)
+    fetchingEvent(state) {
+      state.fetchEventError = false
+      state.fetchEventSuccess = false
+      state.fetchingEvent = true
+    },
+    fetchEventError(state) {
+      state.fetchingEvent = true
+      state.fetchEventError = true
+    },
+    fetchedEvent(state, event) {
+      state.fetchingEvent = false
+      state.fetchEventSuccess = true
+      state.event = event
     },
     //CREATE event
     addingEvent(state) {
@@ -104,20 +141,20 @@ export default new Vuex.Store({
         return event
       })
     },
-    // READ NPO
-    fetchingNPO(state) {
-      state.fetchNPOError = false
-      state.fetchNPOSuccess = false
-      state.fetchingNPO = true
+    // READ NPOs
+    fetchingNPOs(state) {
+      state.fetchNPOsError = false
+      state.fetchNPOsSuccess = false
+      state.fetchingNPOs = true
     },
-    fetchNPOError(state) {
+    fetchNPOsError(state) {
       state.fetchingNPO = false
-      state.fetchNPOError = true
+      state.fetchNPOsError = true
     },
-    fetchedNPO(state, npo) {
+    fetchedNPOs(state, npos) {
       state.fetchingNPO = false
-      state.fetchNPOSuccess = true
-      state.npo = npo
+      state.fetchNPOsSuccess = true
+      state.npos = npos
     },
     //CREATE NPO
     addingNPO(state) {
@@ -206,7 +243,61 @@ export default new Vuex.Store({
       state.updatingVolunteer = false
       state.updateVolunteerSuccess = true
       state.volunteer = updatedVolunteer
-    }
+    },
+    deletingVolunteer(state) {
+      state.deleteVolunteerError = false
+      state.deleteVolunteerSuccess = false
+      state.deletingVolunteer = true
+    },
+    deleteVolunteerError(state) {
+      state.deletingVolunteer = false
+      state.deleteVolunteerError = true
+    },
+    deletedVolunteer(state) {
+      state.deletingVolunteer = true
+      state.deleteVolunteerSuccess = true
+    },
+    //READ all Volunteer shifts
+    fetchingVolShifts(state) {
+      state.fetchVolShiftsError = false
+      state.fetchEventsSuccess = false
+      state.fetchingVolShifts = true
+    },
+    fetchVolShiftsError(state) {
+      state.fetchingVolShifts = false
+      state.fetchVolShiftsError = true
+    },
+    fetchedVolShifts(state, volShifts) {
+      state.fetchingVolShifts = false
+      state.fetchVolShiftsSuccess = true
+      state.volunteerShifts = volShifts
+    },
+    //UPDATE Shift - Volunteer sign up
+    signingUpShift(state) {
+      state.signUpShiftError = false
+      state.signUpShiftSuccess = false
+      state.signingUpShift = true
+    },
+    signUpShiftError(state) {
+      state.signingUpShift = false
+      state.signUpShiftError = true
+    },
+    signedUpShift(state, newShift) {
+      state.signingUpShift = false
+      state.signUpShiftSuccess = true
+      volunteerShifts.push(newShift)
+    },
+    //UPDATE Shift - Volunteer cancel
+    cancelingShift(state) {
+      state.cancelShiftError = false
+      state.cancelShiftSuccess = false
+      state.cancelingShift = true
+    },
+    cancelShiftError(state) {
+      state.cancelingShift = false
+      state.cancelShiftError = true
+    },
+
 
   },
   actions: {
@@ -221,6 +312,19 @@ export default new Vuex.Store({
         .catch(error => {
           console.log("getOpenEvents action error: ", error)
           commit("fetchEventsError")
+        })
+    },
+    //READ event (SHOW)
+    getEvent({ commit }, eventID) {
+      commit("fetchingEvent")
+      axios.get(`http://localhost:8081/api/events/${eventID}`)
+        .then(response => {
+          console.log("getEvent action response: ", response)
+          commit('fetchedEvent', response.data)
+        })
+        .catch(error => {
+          console.error("getEvent action error: ", error)
+          commit("fetchEventError")
         })
     },
     //CREATE event
@@ -279,20 +383,20 @@ export default new Vuex.Store({
         })
     },
     //READ NPO
-    getNPO({ commit }, npoID) {
-      commit("fetchingNPO")
-      axios.get(`http://localhost:8081/api/npos/${npoID}`)
+    getNPOs({ commit }, npoID) {
+      commit("fetchingNPOss")
+      axios.get(`http://localhost:8081/api/npos`)
         .then(response => {
           console.log("getNPO action response: ", response)
-          commit("fetchedNPO", response.data)
+          commit("fetchedNPOs", response.data)
         })
         .catch(error => {
           console.error("getNPO action error: ", error)
-          commit("fetchNPOError")
+          commit("fetchNPOsError")
         })
     },
     //CREATE NPO
-    addNPO({ commit }, newNPO) {
+    addNPOs({ commit }, newNPO) {
       // example newNPO
       // {
       //   "NPOName": "Organization",
@@ -399,6 +503,66 @@ export default new Vuex.Store({
         .catch(error => {
           console.error("updateVolunteer action error: ", error)
           commit("updateVolunteerError")
+        })
+    },
+    //DELETE Volunteer
+    deleteVolunteer({ commit }, volunteerID) {
+      commit("deletingVolunteer")
+      axios.delete(`http://localhost:8081/api/volunteers/${volunteerID}`)
+        .then(response => {
+          console.log("deleteVolunteer action response: ", response)
+          commit("deletedVolunteer")
+        })
+        .catch(error => {
+          console.error("deleteVolunteer action error: ", error)
+          commit("deleteVolunteerError")
+        })
+    },
+    //READ Volunteer Shifts
+    getAllVolunteerShifts({ commit }, volunteer) {
+      commit("fetchingVolShifts")
+      axios.get(`http://localhost:8081/api/shifts/volunteers/${volunteer.ID}`)
+        .then(response => {
+          console.log("getAllVolunteerShifts action response: ", response)
+          commit("fetchedVolShifts", response.data)
+        })
+        .catch(error => {
+          console.error("getAllVolunteerShifts action error: ", error)
+          commit("fetchVolShiftsError")
+        })
+    },
+    //Volunteer Shift signup (UPDATE Shift)
+    signUpForShift({ commit }, signupObj) {
+      commit("signingUpShift")
+      let shiftID = signupObj.ID
+      let updatedShift = {
+        VolunteerID: signupObj.volunteerID
+      }
+      axios.put(`http://localhost:8081/api/shifts/${shiftID}`, updatedShift)
+        .then(response => {
+          console.log("signUpForShift action response: ", response)
+          commit("signedUpShift", response.data)
+        })
+        .catch(error => {
+          console.error("signUpForShift action error: ", error)
+          commit("signUpShiftError")
+        })
+    },
+    //Volunteer Shift cancel (UPDATE Shift)
+    cancelShift({ commit }, cancelObj) {
+      commit("cancelingShift")
+      let shiftID = cancelObj.ID
+      let updatedShift = {
+        VolunteerID: cancelObj.VolunteerID
+      }
+      axios.put(`http://localhost:8081/api/shifts/cancel/${shiftID}`)
+        .then(response => {
+          console.log("cancelShift action response: ", response)
+          commit("canceledShift", response.data)
+        })
+        .catch(error => {
+          console.error("cancelShift action error: ", error)
+          commit("cancelShiftError")
         })
     }
 

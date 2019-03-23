@@ -28,6 +28,12 @@ export default new Router({
       path: '/register',
       name: 'Register',
       component: () => import('./views/Register.vue')
+    },
+    {
+      path: '/event/:id',
+      props: true,
+      name: 'Event',
+      component: () => import('./views/Event.vue')
     }
   ],
 });
