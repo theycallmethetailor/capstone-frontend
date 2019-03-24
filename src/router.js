@@ -34,6 +34,17 @@ export default new Router({
       props: true,
       name: 'Event',
       component: () => import('./views/Event.vue')
+    },
+    {
+      path: '/volunteer/calendar',
+      name: "VolCalendar",
+      component: () => import('./views/VolCalendar.vue')
+    },
+    {
+      path: '/npo/:id',
+      props: true,
+      name: 'NPO',
+      component: () => import('./views/NPO.vue')
     }
   ],
 });

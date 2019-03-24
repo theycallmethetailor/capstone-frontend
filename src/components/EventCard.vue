@@ -5,31 +5,56 @@
     min-height="20vh"
     >
         <v-card-title class="primary white--text" primary-title>
-            {{event.Name}} |
-            {{ startDateRead }}
-            <v-icon right class="white--text">event</v-icon>
+            {{event.Name}}
         </v-card-title>
        
         <v-card-text>
-            <h3> {{npo.NPOName || null}} </h3>
+            <h4> <v-icon left >event</v-icon>  {{ startDateRead }} </h4>
+            <v-btn
+              flat
+              color="primary"
+              :to="'/npo/' + event.NPOID"
+            >
+            <h3> {{event.NPOName || null}} </h3>
+
+            </v-btn>
             <div>
-                <small class="text-center"> {{event.Location}} </small>
+                <small v-if="!eventView" class="text-center"> {{event.Location}} </small>
+            </div>
+            <v-container v-if="eventView">
+              <v-layout>
+                <v-flex xs12 sm12 md6 lg6 xl6>
                 <v-container>
                     <v-layout row >
-                        <v-flex xs> 
+                        <v-flex>
+                            <h4>Event Location: {{event.Location}} </h4> 
                             <div v-if="eventView" id="map"></div>
                         </v-flex>
                     </v-layout>
                 </v-container>
-            </div>
-            <h4 v-if="eventView" > From {{ startDateLong }} to {{endDateLong}} </h4>
+
+                </v-flex>
+                <v-flex xs12 sm12 md6 lg6 xl6>
+                  <h4 v-if="eventView" > This event is from {{ startDateLong }} to {{endDateLong}} </h4>
+                  <v-container>
+                    <v-layout>
+                      <v-flex>
+                        <VolCalendar />
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                  
+                </v-flex>
+              </v-layout>
+            </v-container>
             <p>{{event.Description}}</p>
             <p v-if="eventView" > {{filledAndOpenShifts.filled  }} of {{ filledAndOpenShifts.needed }} shifts filled. </p>
         </v-card-text>
 
         <v-card-actions>
             <v-btn v-if="!eventView" :to="'/event/' + event.ID" flat color="primary">Volunteer</v-btn>
-            <v-btn v-if="eventView" @click="" flat color="primary">Sign Up</v-btn>
+            <v-btn v-if="eventView && !volIsSignedUp" @click="volSignUp" flat color="primary">Sign Up</v-btn>
+            <v-btn v-if="eventView && volIsSignedUp" @click="volSignUp" flat color="error">Cancel Shift</v-btn>
 
         </v-card-actions>
     </v-card>
@@ -38,10 +63,13 @@
 <script>
 import moment from "moment";
 import gmapsInit from "../utils/gmaps";
-
+import VolCalendar from "../views/VolCalendar.vue";
 export default {
   name: "EventCard",
   props: ["event", "index", "eventView"],
+  components: {
+    VolCalendar
+  },
   data() {
     return {
       map: null,
@@ -52,34 +80,34 @@ export default {
       }
     };
   },
+  // async mounted() {
+  //   try {
+  //     const google = await gmapsInit();
+  //     const geocoder = new google.maps.Geocoder();
+  //     const map = new google.maps.Map(document.getElementById("map"));
 
-  //   async mounted() {
-  //     try {
-  //       const google = await gmapsInit();
-  //       const geocoder = new google.maps.Geocoder();
-  //       const map = new google.maps.Map(document.getElementById("map"));
+  //     geocoder.geocode({ address: this.event.Location }, (results, status) => {
+  //       if (status !== "OK" || !results[0]) {
+  //         throw new Error(status);
+  //       }
 
-  //       geocoder.geocode({ address: this.event.Location }, (results, status) => {
-  //         if (status !== "OK" || !results[0]) {
-  //           throw new Error(status);
-  //         }
-
-  //         map.setCenter(results[0].geometry.location);
-  //         map.fitBounds(results[0].geometry.viewport);
-  //         this.addressLatLgn.position = results[0].geometry.location;
-  //         new google.maps.Marker({ ...this.addressLatLgn, map });
-  //       });
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   },
+  //       map.setCenter(results[0].geometry.location);
+  //       map.fitBounds(results[0].geometry.viewport);
+  //       this.addressLatLgn.position = results[0].geometry.location;
+  //       new google.maps.Marker({ ...this.addressLatLgn, map });
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // },
   computed: {
-    npo() {
-      return this.$store.state.npos.find(item => item.ID === this.event.NPOID);
-      //   return this.$store.state.npos;
+    volIsSignedUp() {
+      return !!this.event.Shifts.filter(
+        shift => shift.VolunteerID === this.$store.state.volunteer.ID
+      );
     },
     startDateRead() {
-      return moment(this.event.StartTime).format("MMMM Do YYYY");
+      return moment(this.event.StartTime).format("MMMM Do");
     },
     startDateLong() {
       return moment(this.event.StartTime).format("MMMM Do YYYY, h:mm a");
@@ -103,6 +131,11 @@ export default {
           needed: this.event.Shifts.length
         }
       );
+    }
+  },
+  methods: {
+    volSignUp() {
+      this.$router.push("/volunteer/calendar");
     }
   }
 };

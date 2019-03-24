@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios'
 import { stat } from 'fs';
+import moment from 'moment'
 
 Vue.use(Vuex);
 
@@ -26,11 +27,16 @@ export default new Vuex.Store({
     updatingEvent: false,
     updateEventError: false,
     updateEventSuccess: false,
-    //READ NPO
+    //READ NPOs
     npos: [],
     fetchingNPOs: false,
     fetchNPOsError: false,
     fetchNPOsSuccess: false,
+    //READ NPO
+    npo: {},
+    fetchingOneNPO: false,
+    fetchOneNPOError: false,
+    fetchOneNPOSuccess: false,
     //CREATE NPO
     addingNPO: false,
     addNPOError: false,
@@ -159,6 +165,21 @@ export default new Vuex.Store({
       state.fetchingNPO = false
       state.fetchNPOsSuccess = true
       state.npos = npos
+    },
+    //READ NPO
+    fetchingOneNPO(state) {
+      state.fetchOneNPOError = false
+      state.fetchOneNPOSuccess = false
+      state.fetchingOneNPO = true
+    },
+    fetchOneNPOError(state) {
+      state.fetchingOneNPO = false
+      state.fetchOneNPOError = true
+    },
+    fetchedOneNPO(state, npo) {
+      state.fetchingOneNPO = false
+      state.fetchOneNPOSuccess = true
+      state.npo = npo
     },
     //CREATE NPO
     addingNPO(state) {
@@ -389,8 +410,8 @@ export default new Vuex.Store({
           commit("updateEventError")
         })
     },
-    //READ NPO
-    getNPOs({ commit }, npoID) {
+    //READ NPOs
+    getNPOs({ commit }) {
       commit("fetchingNPOs")
       axios.get(`http://localhost:8081/api/npos`)
         .then(response => {
@@ -400,6 +421,19 @@ export default new Vuex.Store({
         .catch(error => {
           console.error("getNPO action error: ", error)
           commit("fetchNPOsError")
+        })
+    },
+    //READ NPO
+    getOneNPO({ commit }, npoID) {
+      commit("fetchingOneNPO")
+      axios.get(`http://localhost:8081/api/npo/${npoID}`)
+        .then(response => {
+          console.log("getOneNPO action response: ", response)
+          commit("fetchedOneNPO", response.data)
+        })
+        .catch(error => {
+          console.error("getOneNPO action error: ", error)
+          commit("fetchOneNPOError")
         })
     },
     //CREATE NPO
@@ -467,11 +501,19 @@ export default new Vuex.Store({
     },
     //READ volunteer
     getVolunteer({ commit }, volunteerID) {
+      volunteerID = 9
       commit("fetchingVolunteer")
-      axios.get(`http://localhost:8081/api/volunteers/${volunteerID}`)
+      axios.get(`http://localhost:8081/api/volunteer/${volunteerID}`)
         .then(response => {
           console.log("getVOlunteer action response: ", response)
-          commit("fetchedVolunteer", response.data)
+          let volunteer = response.data
+          volunteer.Shifts = volunteer.Shifts.map(shift => {
+            return {
+              ...shift,
+              time: moment(shift.ActualStartTime).format('kk:mm')
+            }
+          })
+          commit("fetchedVolunteer", volunteer)
 
         })
         .catch(error => {
