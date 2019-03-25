@@ -4,18 +4,21 @@
     hover
     min-height="20vh"
     >
-        <v-card-title class="primary white--text" primary-title>
-            {{event.Name}}
+        <v-card-title 
+        class="primary white--text" 
+        primary-title
+        >
+          {{event.Name}}
         </v-card-title>
        
         <v-card-text>
-            <h4> <v-icon left >event</v-icon>  {{ startDateRead }} </h4>
+            <h4> <v-icon left >event</v-icon>  {{ startDateRead }} to {{ endDateRead }} </h4>
             <v-btn
               flat
               color="primary"
               :to="'/npo/' + event.NPOID"
             >
-            <h3> {{event.NPOName || null}} </h3>
+            <h3> {{ event.NPOName || event.NPOName}} </h3>
 
             </v-btn>
             <div>
@@ -66,7 +69,7 @@ import gmapsInit from "../utils/gmaps";
 import VolCalendar from "../views/VolCalendar.vue";
 export default {
   name: "EventCard",
-  props: ["event", "index", "eventView"],
+  props: ["event", "index", "eventView", "npo"],
   components: {
     VolCalendar
   },
@@ -108,6 +111,9 @@ export default {
     },
     startDateRead() {
       return moment(this.event.StartTime).format("MMMM Do");
+    },
+    endDateRead() {
+      return moment(this.event.EndTime).format("MMMM Do");
     },
     startDateLong() {
       return moment(this.event.StartTime).format("MMMM Do YYYY, h:mm a");

@@ -34,6 +34,7 @@ export default new Vuex.Store({
     fetchNPOsSuccess: false,
     //READ NPO
     npo: {},
+    npoEvents: [],
     fetchingOneNPO: false,
     fetchOneNPOError: false,
     fetchOneNPOSuccess: false,
@@ -79,6 +80,11 @@ export default new Vuex.Store({
     cancelingShift: false,
     cancelShiftError: false,
     cancelShiftSuccess: false,
+    //READ Tags
+    tags: [],
+    fetchingTags: false,
+    fetchTagsError: false,
+    fetchTagsSuccess: false
   },
   mutations: {
     toggleDrawer(state) {
@@ -180,6 +186,7 @@ export default new Vuex.Store({
       state.fetchingOneNPO = false
       state.fetchOneNPOSuccess = true
       state.npo = npo
+      state.npoEvents = npo.Events
     },
     //CREATE NPO
     addingNPO(state) {
@@ -322,7 +329,20 @@ export default new Vuex.Store({
       state.cancelingShift = false
       state.cancelShiftError = true
     },
-
+    fetchingTags(state) {
+      state.fetchTagsError = false
+      state.fetchTagsSuccess = false
+      state.fetchingTags = true
+    },
+    fetchTagsError(state) {
+      state.fetchingTags = false
+      state.fetchTagsError = true
+    },
+    fetchedTags(state, tags) {
+      state.fetchingTags = false
+      state.fetchTagsSuccess = true
+      state.tags = tags
+    }
 
   },
   actions: {
@@ -505,14 +525,14 @@ export default new Vuex.Store({
       commit("fetchingVolunteer")
       axios.get(`http://localhost:8081/api/volunteer/${volunteerID}`)
         .then(response => {
-          console.log("getVOlunteer action response: ", response)
+          console.log("getVolunteer action response: ", response)
           let volunteer = response.data
-          volunteer.Shifts = volunteer.Shifts.map(shift => {
+          volunteer.Shifts = volunteer.Shifts ? volunteer.Shifts.map(shift => {
             return {
               ...shift,
               time: moment(shift.ActualStartTime).format('kk:mm')
             }
-          })
+          }) : []
           commit("fetchedVolunteer", volunteer)
 
         })
@@ -613,7 +633,35 @@ export default new Vuex.Store({
           console.error("cancelShift action error: ", error)
           commit("cancelShiftError")
         })
-    }
+    },
+    getAllTags({ commit }) {
+      commit("fetchingTags")
+      axios.get("http://localhost:8081/api/tags")
+        .then(response => {
+          console.log("getAllTags action response: ", response)
+          commit("fetchedTags", response.data)
+        })
+        .catch(error => {
+          console.error("getAllTags action error: ", error)
+          commit("fetchTagsError")
+        })
+    },
 
   },
+  getters: {
+    npoPastEvents(state) {
+      console.log(state.npoEvents)
+      const now = Date.now()
+      return state.npoEvents.filter(event => event.EndTime < now)
+    },
+    npoUpcomingEvents(state) {
+      const now = Date.now()
+      return state.npoEvents.filter(event => event.StartTime > now)
+    },
+    tagNames(state) {
+      return state.tags.map(tag => {
+        return tag.TagName
+      })
+    }
+  }
 });

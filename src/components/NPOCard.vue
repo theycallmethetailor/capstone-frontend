@@ -1,18 +1,83 @@
 <template>
-    <div>
-        This is the npo card!
-    </div>
+  <v-card
+  tile
+  hover
+  min-heigh="20vh"
+  >
+    <v-card-title
+    class="primary white--text"
+    primary-title
+    >
+    {{npo.NPOName}}
+    </v-card-title>
+    <v-card-text>
+      {{ npo.Description }}
+        <v-select
+          :items="eventsSelect"
+          label="Filter Events"
+          v-model="eventsType"
+        ></v-select>
+        <v-autocomplete
+          clearable
+          v-model="eventID"
+          item-text="Name"
+          item-value="ID"
+          name="agency"
+          :items="allEvents"
+          label="Search Events"
+          >
+            <template v-slot:append-outer>
+              <v-slide-x-reverse-transition
+                  mode="out-in"
+                >
+                </v-slide-x-reverse-transition>
+              </template>
+          </v-autocomplete>
+          <v-btn 
+          v-if="npoLoggedIn"
+          color="primary"
+          :to="'/new/event/' + npo.ID" 
+          >
+            Schedule New Event
+          </v-btn>
+
+    <v-container grid-list-md>
+      <h3>{{ eventsType }} Events </h3>
+      <!-- Events -->
+      <v-layout row wrap >
+        <v-flex 
+        xs12 
+        md6 
+        lg4 
+        xl4
+        v-for="(event, i) in filteredEvents"
+        :key="event.ID"
+        >
+        <EventCard :npo="npo" :event="event" :index="i" /> 
+        </v-flex>
+      </v-layout>
+    </v-container>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
+import EventCard from "@/components/EventCard.vue";
 export default {
   name: "NPOCard",
   props: ["id"],
+  components: {
+    EventCard
+  },
   data() {
-      return {
-          now: new Date().getMilliseconds()
-      }
-  }.
+    return {
+      npoLoggedIn: true,
+      eventID: undefined,
+      now: Date.now(),
+      eventsType: "Upcoming",
+      eventsSelect: ["Upcoming", "Past", "Both"]
+    };
+  },
   created() {
     this.$store.dispatch("getOneNPO", this.id);
   },
@@ -20,12 +85,44 @@ export default {
     npo() {
       return this.$store.state.npo;
     },
+    isUpcoming() {
+      return this.eventsType === "Upcoming";
+    },
+    isBoth() {
+      return this.eventsType === "Both";
+    },
+    isPast() {
+      return this.eventsType === "Past";
+    },
+    allEvents() {
+      return this.$store.state.npoEvents;
+    },
     pastEvents() {
-
-
+      return this.$store.getters.npoPastEvents;
     },
     upcomingEvents() {
-        
+      return this.$store.getters.npoUpcomingEvents;
+    },
+    filteredEvents() {
+      if (this.isBoth) {
+        if (this.eventID) {
+          return this.allEvents.filter(event => event.ID === this.eventID);
+        } else {
+          return this.allEvents;
+        }
+      } else if (this.isPast) {
+        if (this.eventID) {
+          return this.pastEvents.filter(event => event.ID === this.eventID);
+        } else {
+          return this.pastEvents;
+        }
+      } else if (this.isUpcoming) {
+        if (this.eventID) {
+          return this.upcomingEvents.filter(event => event.ID === this.eventID);
+        } else {
+          return this.upcomingEvents;
+        }
+      }
     }
   }
 };

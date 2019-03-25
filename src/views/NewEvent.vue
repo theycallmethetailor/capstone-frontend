@@ -2,19 +2,19 @@
     <v-container>
         <v-layout>
             <v-flex>
-                <NPOCard :id="Number(id)" />
+                <NewEventForm :npoID="Number(npoID)" />
             </v-flex>
         </v-layout>
     </v-container>
 </template>
 
 <script>
-import NPOCard from "../components/NPOCard.vue";
+import NewEventForm from "../components/NewEventForm.vue";
 export default {
-  name: "NPO",
-  props: ["id"],
+  name: "NewEvent",
+  props: ["npoID"],
   components: {
-    NPOCard
+    NewEventForm
   }
 };
 </script>

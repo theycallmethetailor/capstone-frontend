@@ -45,6 +45,12 @@ export default new Router({
       props: true,
       name: 'NPO',
       component: () => import('./views/NPO.vue')
+    },
+    {
+      path: '/new/event/:npoID',
+      props: true,
+      name: 'NewEvent',
+      component: () => import('./views/NewEvent.vue')
     }
   ],
 });
