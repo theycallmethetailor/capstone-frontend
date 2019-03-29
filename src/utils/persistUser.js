@@ -1,9 +1,9 @@
-export const persistUser = function (user) {
-    localStorage.setItem('id', user.ID)
-    localStorage.setItem('user_type', user.UserType)
+export const persistUser = function (user, local) {
+    local.set('id', user.ID)
+    local.set('user_type', user.UserType)
 }
 
-export const removePersistedUser = function () {
+export const removePersistedUser = function (local) {
     const items = ['id', 'user_type']
-    items.forEach(item => localStorage.removeItem(item))
+    items.forEach(item => local.remove(item))
 }

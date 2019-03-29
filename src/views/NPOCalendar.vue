@@ -178,10 +178,10 @@ export default {
       return this.$store.state.npo;
     },
     npoLoggedIn() {
-      return localStorage.user_type === "NPO";
+      return this.$ls.get("user_type") === "NPO";
     },
     loggedInNPOisThisOne() {
-      return this.npoLoggedIn && Number(localStorage.id) === Number(this.id);
+      return this.npoLoggedIn && Number(this.$ls.get("id")) === Number(this.id);
     },
     // convert the list of shifts into a map of lists keyed by date
     eventsMap() {

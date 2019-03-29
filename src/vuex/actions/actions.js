@@ -33,14 +33,13 @@ export const actions = {
                 console.log("login action respone: ", response)
                 const responseUser = response.data
                 responseUser.UserType = responseUser.NPOName ? "NPO" : "Volunteer"
+                responseUser.ls = user.ls
                 commit("loginUser", responseUser)
                 user.router.push("/")
-                resolve(response)
             })
             .catch(error => {
                 console.error("login action error: ", error)
                 commit("loginError")
-                reject(error)
             })
     }
 }

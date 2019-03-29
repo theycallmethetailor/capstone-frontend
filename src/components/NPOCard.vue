@@ -89,10 +89,10 @@ export default {
   },
   computed: {
     npoLoggedIn() {
-      return localStorage.user_type === "NPO";
+      return this.$ls.get("user_type") === "NPO";
     },
     loggedInNPOisThisOne() {
-      return this.npoLoggedIn && Number(localStorage.id) === Number(this.id);
+      return this.npoLoggedIn && Number(this.$ls.get("id")) === Number(this.id);
     },
     npo() {
       return this.$store.state.npo;

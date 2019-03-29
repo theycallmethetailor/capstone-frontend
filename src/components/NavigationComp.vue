@@ -17,41 +17,37 @@
 <script>
 export default {
   name: "NavigationComp",
-  mounted() {
-    if (localStorage.getItem("id")) {
-      this.userLoggedIn = true;
-    } else {
-      this.userLoggedIn = false;
-    }
-  },
-  watch: {
-    userLoggedIn(id) {
-      localStorage.id = id;
-    }
-  },
   methods: {
     toggleDrawer() {
       this.$store.dispatch("toggleDrawer");
     },
     logout() {
       console.log("logout method fired");
-      this.$store.commit("logout", this.$router);
+      let necObj = {
+        router: this.$router,
+        ls: this.$ls
+      };
+      this.$store.commit("logout", necObj);
     }
   },
   computed: {
     userLoggedIn: {
       get() {
-        return !!localStorage.getItem("id") || false;
+        return !!this.$ls.get("id", false);
       },
       set() {
-        this.$store.commit("logout", this.$router);
+        let necObj = {
+          router: this.$router,
+          ls: this.$ls
+        };
+        this.$store.commit("logout", necObj);
       }
     },
     calendarPath() {
-      if (this.userLoggedIn && localStorage.user_type === "Volunteer") {
-        return `/volunteer/calendar/${localStorage.id}`;
-      } else if (this.userLoggedIn && localStorage.user_type === "NPO") {
-        return `/calendar/npo/${localStorage.id}`;
+      if (this.userLoggedIn && this.$ls.get("user_type") === "Volunteer") {
+        return `/volunteer/calendar/${this.$ls.get("id")}`;
+      } else if (this.userLoggedIn && this.$ls.get("user_type") === "NPO") {
+        return `/calendar/npo/${this.$ls.get("id")}`;
       }
     }
   }

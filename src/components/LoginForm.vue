@@ -113,7 +113,8 @@ export default {
           Email: this.Email,
           Password: this.Password,
           UserType: this.userType,
-          router: this.$router
+          router: this.$router,
+          ls: this.$ls
         };
         this.$store.dispatch("login", user);
       }

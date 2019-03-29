@@ -32,10 +32,10 @@ export default {
             ...newVolunteer,
             UserType: "Volunteer"
         }
-        persistUser(loggedVolunteer)
+        persistUser(loggedVolunteer, newVolunteer.ls)
         state.loggedInUser = newVolunteer
-        state.loggedInUserRole = localStorage.user_type
-        state.loggedInUserID = localStorage.id
+        state.loggedInUserRole = newVolunteer.ls.get('user_type')
+        state.loggedInUserID = newVolunteer.ls.get('id')
     },
     //UPDATE Volunteer
     updatingVolunteer(state) {

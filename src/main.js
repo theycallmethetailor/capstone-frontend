@@ -6,8 +6,14 @@ import store from './vuex/store';
 import 'vuetify/dist/vuetify.min.css';
 import colors from 'vuetify/es5/util/colors'
 import moment from 'moment'
+import VueLocalStorage from 'vue-localstorage'
 
 import VuetifyGoogleAutocomplete from 'vuetify-google-autocomplete';
+
+Vue.use(VueLocalStorage, {
+  name: 'ls',
+  bind: true //created computed members from your variable declarations
+})
 
 Vue.prototype.moment = moment
 

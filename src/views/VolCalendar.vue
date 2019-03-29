@@ -184,7 +184,7 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("getVolunteer", localStorage.id); //take out hard coding once login/out added
+    this.$store.dispatch("getVolunteer", this.$ls.get("id")); //take out hard coding once login/out added
   },
   mounted() {
     this.$refs.calendar.scrollToTime("08:00");

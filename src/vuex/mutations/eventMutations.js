@@ -1,5 +1,5 @@
 
-export default {
+module.exports = {
     //READ events
     fetchingEvents(state) {
         state.fetchEventsError = false

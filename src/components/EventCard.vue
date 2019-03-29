@@ -147,23 +147,23 @@ export default {
   // },
   computed: {
     volunteerLoggedIn() {
-      return !!localStorage.id && localStorage.user_type === "Volunteer";
+      return !!this.$ls.id && this.$ls.user_type === "Volunteer";
     },
     npoLoggedIn() {
-      return !!localStorage.id && localStorage.user_type === "NPO";
+      return !!this.$ls.id && this.$ls.user_type === "NPO";
     },
     volunteerID() {
-      return this.volunteerLoggedIn ? localStorage.id : null;
+      return this.volunteerLoggedIn ? this.$ls.id : null;
     },
     npoID() {
-      return this.npoLoggedIn ? localStorage.id : null;
+      return this.npoLoggedIn ? this.$ls.id : null;
     },
     volIsSignedUp() {
-      if (this.event.Shifts && localStorage.user_type === "Volunteer") {
+      if (this.event.Shifts && this.$ls.user_type === "Volunteer") {
         return (
           // !!this.$store.state.volunteer &&
           !!this.event.Shifts.filter(
-            shift => Number(shift.VolunteerID) === Number(localStorage.id)
+            shift => Number(shift.VolunteerID) === Number(this.$ls.id)
           ).length
         );
       }
@@ -216,17 +216,16 @@ export default {
     volSignUp() {
       let signupObj = {
         ID: this.firstOpenShift.ID,
-        VolunteerID: localStorage.id,
+        VolunteerID: this.$ls.id,
         router: this.$router
       };
       this.$store.dispatch("signUpForShift", signupObj);
     },
     volCancelShift() {
       let cancelOb = {
-        ID: this.event.Shifts.find(
-          event => event.VolunteerID === localStorage.id
-        ).ID,
-        VolunteerID: localStorage.id,
+        ID: this.event.Shifts.find(event => event.VolunteerID === this.$ls.id)
+          .ID,
+        VolunteerID: this.$ls.id,
         router: this.$router
       };
       this.$store.dispatch("cancelShift", cancelOb);

@@ -166,7 +166,8 @@ export default {
             Username: this.Username.toLowerCase(),
             Password: this.Password,
             UserType: this.userType,
-            router: this.$router
+            router: this.$router,
+            ls: this.$ls
           };
           this.$store.dispatch("addVolunteer", newUserObj);
         }
