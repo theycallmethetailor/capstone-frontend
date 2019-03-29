@@ -36,7 +36,8 @@ export default new Router({
       component: () => import('./views/Event.vue')
     },
     {
-      path: '/volunteer/calendar',
+      path: '/volunteer/calendar/:volID',
+      props: true,
       name: "VolCalendar",
       component: () => import('./views/VolCalendar.vue')
     },
@@ -45,6 +46,12 @@ export default new Router({
       props: true,
       name: 'NPO',
       component: () => import('./views/NPO.vue')
+    },
+    {
+      path: '/calendar/npo/:npoID',
+      props: true,
+      name: 'NPOCalendar',
+      component: () => import('./views/NPOCalendar.vue')
     },
     {
       path: '/new/event/:npoID',

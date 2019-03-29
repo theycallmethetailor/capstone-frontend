@@ -7,11 +7,20 @@
         <v-card-title 
         class="primary white--text" 
         primary-title
+        @click="goToEvent"
         >
           {{event.Name}}
         </v-card-title>
        
         <v-card-text>
+        <v-alert
+          :value="volIsSignedUp"
+          color="info"
+          icon="info"
+          outline
+        >
+          You are already signed up for this shift.
+        </v-alert>
             <h4> <v-icon left >event</v-icon>  {{ startDateRead }} to {{ endDateRead }} </h4>
             <v-btn
               flat
@@ -32,6 +41,20 @@
                         <v-flex>
                             <h4>Event Location: {{event.Location}} </h4> 
                             <div v-if="eventView" id="map"></div>
+                            <v-layout>
+                              <v-flex>
+                                <v-card  flat>
+                                  <v-card-title>
+                                    <h4>Description</h4>
+                                  </v-card-title>
+                                  <v-card-text >
+                                    <p>{{event.Description}}</p>
+                                  </v-card-text>
+                                </v-card>
+                              </v-flex>
+
+                            </v-layout>
+
                         </v-flex>
                     </v-layout>
                 </v-container>
@@ -42,7 +65,7 @@
                   <v-container>
                     <v-layout>
                       <v-flex>
-                        <VolCalendar />
+                        <VolCalendar :eventView="true" :id="volunteerID" />
                       </v-flex>
                     </v-layout>
                   </v-container>
@@ -50,14 +73,26 @@
                 </v-flex>
               </v-layout>
             </v-container>
-            <p>{{event.Description}}</p>
+            <v-expansion-panel v-if="!eventView" inset>
+              <v-expansion-panel-content>
+                <template v-slot:header>
+                  <h4>Description</h4>
+                </template>
+                <v-card color="secondary"  flat>
+                  <v-card-text class="white--text font-weight-thin" >
+                    <p>{{event.Description}}</p>
+                  </v-card-text>
+                </v-card>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
             <p v-if="eventView" > {{filledAndOpenShifts.filled  }} of {{ filledAndOpenShifts.needed }} shifts filled. </p>
+            <p class="grey--text" > Tags:  {{eventTags}} </p>
         </v-card-text>
 
         <v-card-actions>
-            <v-btn v-if="!eventView" :to="'/event/' + event.ID" flat color="primary">Volunteer</v-btn>
-            <v-btn v-if="eventView && !volIsSignedUp" @click="volSignUp" flat color="primary">Sign Up</v-btn>
-            <v-btn v-if="eventView && volIsSignedUp" @click="volSignUp" flat color="error">Cancel Shift</v-btn>
+            <v-btn v-if="!eventView" @click="goToEvent" flat color="primary">Volunteer</v-btn>
+            <v-btn v-if="eventView && volunteerLoggedIn && !!firstOpenShift && !volIsSignedUp" @click="volSignUp" flat color="primary">Sign Up</v-btn>
+            <v-btn v-if=" eventView && volunteerLoggedIn  && volIsSignedUp" @click="volCancelShift" flat color="error">Cancel Shift</v-btn>
 
         </v-card-actions>
     </v-card>
@@ -75,6 +110,7 @@ export default {
   },
   data() {
     return {
+      volLoggedIn: false,
       map: null,
       tileLayer: null,
       layers: [],
@@ -104,16 +140,33 @@ export default {
   //   }
   // },
   computed: {
+    volunteerLoggedIn() {
+      return !!localStorage.id && localStorage.user_type === "Volunteer";
+    },
+    volunteerID() {
+      return this.volunteerLoggedIn ? localStorage.id : null;
+    },
     volIsSignedUp() {
-      return !!this.event.Shifts.filter(
-        shift => shift.VolunteerID === this.$store.state.volunteer.ID
-      );
+      if (this.event.Shifts && localStorage.user_type === "Volunteer") {
+        return (
+          // !!this.$store.state.volunteer &&
+          !!this.event.Shifts.filter(
+            shift => Number(shift.VolunteerID) === Number(localStorage.id)
+          ).length
+        );
+      }
+    },
+    eventTags() {
+      if (this.event.Tags) {
+        return this.event.Tags.map(tag => tag.TagName).join(", ");
+      }
+      return [];
     },
     startDateRead() {
-      return moment(this.event.StartTime).format("MMMM Do");
+      return moment(this.event.StartTime).format("MMMM Do h:mm a");
     },
     endDateRead() {
-      return moment(this.event.EndTime).format("MMMM Do");
+      return moment(this.event.EndTime).format("MMMM Do h:mm a");
     },
     startDateLong() {
       return moment(this.event.StartTime).format("MMMM Do YYYY, h:mm a");
@@ -122,26 +175,55 @@ export default {
       return moment(this.event.EndTime).format("MMMM Do YYYY, h:mm a");
     },
     firstOpenShift() {
-      return this.event.Shifts.find(shift => shift.VolunteerID === 0);
+      if (this.event.Shifts) {
+        return this.event.Shifts.find(shift => shift.VolunteerID === 0);
+      }
     },
     filledAndOpenShifts() {
-      return this.event.Shifts.reduce(
-        (acc, shift) => {
-          if (shift.VolunteerID !== 0) {
-            acc.filled++;
+      if (this.event.Shifts) {
+        return this.event.Shifts.reduce(
+          (acc, shift) => {
+            if (shift.VolunteerID !== 0) {
+              acc.filled++;
+            }
+            return acc;
+          },
+          {
+            filled: 0,
+            needed: this.event.Shifts.length
           }
-          return acc;
-        },
-        {
-          filled: 0,
-          needed: this.event.Shifts.length
-        }
-      );
+        );
+      }
+      return {
+        filled: 0,
+        needed: 0
+      };
     }
   },
   methods: {
     volSignUp() {
-      this.$router.push("/volunteer/calendar");
+      let signupObj = {
+        ID: this.firstOpenShift.ID,
+        VolunteerID: localStorage.id,
+        router: this.$router
+      };
+      this.$store.dispatch("signUpForShift", signupObj);
+    },
+    volCancelShift() {
+      let cancelOb = {
+        ID: this.event.Shifts.find(
+          event => event.VolunteerID === localStorage.id
+        ).ID,
+        VolunteerID: localStorage.id,
+        router: this.$router
+      };
+      this.$store.dispatch("cancelShift", cancelOb);
+    },
+    goToEvent() {
+      if (!this.eventView) {
+        this.$store.dispatch("resetAddEventSuccess");
+        this.$router.push(`/event/${this.event.ID}`);
+      }
     }
   }
 };

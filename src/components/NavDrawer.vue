@@ -40,7 +40,8 @@ export default {
     return {
       items: [
         { title: "Home", icon: "dashboard", path: "/" },
-        { title: "About", icon: "question_answer", path: "/about" }
+        { title: "About", icon: "question_answer", path: "/about" },
+        { title: "Login", icon: "question_answer", path: "/login" }
       ]
     };
   },

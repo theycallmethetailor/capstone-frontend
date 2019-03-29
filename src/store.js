@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios'
 import { stat } from 'fs';
 import moment from 'moment'
+import { reject, resolve } from 'bluebird';
 
 Vue.use(Vuex);
 
@@ -84,7 +85,26 @@ export default new Vuex.Store({
     tags: [],
     fetchingTags: false,
     fetchTagsError: false,
-    fetchTagsSuccess: false
+    fetchTagsSuccess: false,
+    //Event Search Data: 
+    searchString: "",
+    searchOption: "All",
+    searchOptions: [
+      "All",
+      "Tags",
+      "Name",
+      "Description",
+      "Non Profit Organization"
+    ],
+    searchStartDate: moment().format().substr(0, 10),
+    searchEndDate: moment().add(1, 'month').format().substr(0, 10),
+    // LOGIN
+    loggingIn: false,
+    loginError: false,
+    loginSuccess: true,
+    loggedInUser: {},
+    loggedInUserRole: localStorage.user_type,
+    loggedInUserID: localStorage.id,
   },
   mutations: {
     toggleDrawer(state) {
@@ -131,9 +151,14 @@ export default new Vuex.Store({
       state.addEventError = true
     },
     addedEvent(state, newEvent) {
+      console.log("addedEvent mutation newEvent: ", newEvent)
       state.addingEvent = false
       state.addEventSuccess = true
       state.openEvents.push(newEvent)
+    },
+    resetAddEventSuccess(state) {
+      state.addEventSuccess = false
+      state.addEventError = false
     },
     //UPDATE event
     updatingEvent(state) {
@@ -317,7 +342,10 @@ export default new Vuex.Store({
     signedUpShift(state, newShift) {
       state.signingUpShift = false
       state.signUpShiftSuccess = true
-      volunteerShifts.push(newShift)
+      state.volunteerShifts.push(newShift)
+    },
+    resetVolSignupSuccess() {
+      this.state.signUpShiftSuccess = false
     },
     //UPDATE Shift - Volunteer cancel
     cancelingShift(state) {
@@ -328,6 +356,17 @@ export default new Vuex.Store({
     cancelShiftError(state) {
       state.cancelingShift = false
       state.cancelShiftError = true
+    },
+    canceledShift(state, cancelledShift) {
+      state.cancelingShift = false
+      state.cancelShiftSuccess = true
+      state.volunteerShifts = state.volunteerShifts.filter(shift => {
+        // shift.VolunteerID !== state.volunteer.ID
+        return shift.VolunteerID !== 9
+      })
+    },
+    resetVolCancelSuccessMessage() {
+      this.state.cancelShiftSuccess = false
     },
     fetchingTags(state) {
       state.fetchTagsError = false
@@ -342,7 +381,42 @@ export default new Vuex.Store({
       state.fetchingTags = false
       state.fetchTagsSuccess = true
       state.tags = tags
+    },
+    //Event Search options
+    updateSearchString(state, searchString) {
+      state.searchString = searchString
+    },
+    updatesearchOption(state, searchOption) {
+      state.searchOption = searchOption
+    },
+    updateSearchStartDate(state, searchStartDate) {
+      state.searchStartDate = searchStartDate
+    },
+    updateSearchEndDate(state, searchEndDate) {
+      state.searchEndDate = searchEndDate
+    },
+    loginError(state) {
+      state.loggingIn = false
+      state.loginError = true
+    },
+    loginUser(state, user) {
+      state.loggingIn = false
+      state.loginSuccess = true
+      persistUser(user)
+      state.loggedInUser = user
+    },
+    logout(state, router) {
+      state.loggingIn = false
+      state.loginError = false
+      state.loginSuccess = true
+      state.loggedInUser = {}
+      state.loggedInUserRole = ""
+      state.loggedInUserID = 0
+      removePersistedUser()
+      // console.log("localstorage.id", )
+      router.push("/")
     }
+
 
   },
   actions: {
@@ -352,7 +426,7 @@ export default new Vuex.Store({
     //READ events
     getOpenEvents({ commit }) {
       commit("fetchingEvents")
-      axios.get(`http://localhost:8081/api/events/open`)
+      axios.get(`http://localhost:8081/api/open/events`)
         .then(response => {
           console.log("getOpenEvents action response: ", response)
           commit("fetchedEvents", response.data)
@@ -375,8 +449,12 @@ export default new Vuex.Store({
           commit("fetchEventError")
         })
     },
+    resetAddEventSuccess({ commit }) {
+      console.log("resetAddEventSuccess action was fired!")
+      commit("resetAddEventSuccess")
+    },
     //CREATE event
-    addEvent({ commit }, newEvent) {
+    addEvent({ commit }, eventData) {
       // example newEvent:
       // {
       //   "NPOID": 5,
@@ -388,12 +466,14 @@ export default new Vuex.Store({
       //   "Location": "515 E Grant St, Phoenix, AZ 85004",
       //   "NumOfVolunteers": 4
       // }
+      console.log(eventData.newEvent)
 
       commit("addingEvent")
-      axios.post(`http://localhost:8081/api/events`, newEvent)
+      axios.post(`http://localhost:8081/api/events`, eventData.newEvent)
         .then(response => {
           console.table("addEvent action response: ", response)
           commit("addedEvent", response.data)
+          eventData.router.push(`/event/${response.data.ID}`)
         })
         .catch(error => {
           console.error("addEvent action error: ", error)
@@ -419,7 +499,7 @@ export default new Vuex.Store({
       //     "Shifts": null
       // }
       commit("updatingEvent")
-      axios.put(`http://localhost:8081/api/events/${updatedEvent.ID}`, updatedEvent)
+      axios.patch(`http://localhost:8081/api/events/${updatedEvent.ID}`, updatedEvent)
         .then(response => {
           console.table("updateEvent action response: ", response)
           commit("updatedEvent", response.data)
@@ -448,7 +528,22 @@ export default new Vuex.Store({
       commit("fetchingOneNPO")
       axios.get(`http://localhost:8081/api/npo/${npoID}`)
         .then(response => {
-          console.log("getOneNPO action response: ", response)
+
+          // let volunteer = response.data
+          // volunteer.Shifts = volunteer.Shifts ? volunteer.Shifts.map(shift => {
+          //   return {
+          //     ...shift,
+          //     time: moment(shift.ActualStartTime).format('kk:mm')
+          //   }
+          // }) : []
+          let npo = response.data
+          npo.Events = npo.Events ? npo.Events.map(event => {
+            return {
+              ...event,
+              time: moment(event.StartTime).format(`'kk:mm'`)
+            }
+          }) : []
+          console.log("getOneNPO action response: ", npo)
           commit("fetchedOneNPO", response.data)
         })
         .catch(error => {
@@ -494,7 +589,7 @@ export default new Vuex.Store({
       //   "Password": "12345"
       // }
       commit("updatingNPO")
-      axios.put(`http://localhost:8081/api/npos/${updatedNPO.ID}`)
+      axios.patch(`http://localhost:8081/api/npos/${updatedNPO.ID}`)
         .then(response => {
           console.log("updateNPO action response: ", response)
           commit("updatedNPO", response.data)
@@ -521,7 +616,6 @@ export default new Vuex.Store({
     },
     //READ volunteer
     getVolunteer({ commit }, volunteerID) {
-      volunteerID = 9
       commit("fetchingVolunteer")
       axios.get(`http://localhost:8081/api/volunteer/${volunteerID}`)
         .then(response => {
@@ -564,7 +658,7 @@ export default new Vuex.Store({
     },
     updateVolunteer({ commit }, updatedVolunteer) {
       commit("updatingVolunteer")
-      axios.put(`http://localhost:8081/api/volunteers/${updatedVolunteer.ID}`)
+      axios.patch(`http://localhost:8081/api/volunteers/${updatedVolunteer.ID}`)
         .then(response => {
           console.log("updateVolunteer action response: ", response)
           commit("updatedVolunteer", response.data)
@@ -604,13 +698,16 @@ export default new Vuex.Store({
     signUpForShift({ commit }, signupObj) {
       commit("signingUpShift")
       let shiftID = signupObj.ID
+      console.log("signUpForShift action shiftID: ", shiftID)
       let updatedShift = {
-        VolunteerID: signupObj.volunteerID
+        VolunteerID: Number(signupObj.VolunteerID)
       }
-      axios.put(`http://localhost:8081/api/shifts/${shiftID}`, updatedShift)
+      console.log("signUpForShift action updatedShift: ", updatedShift)
+      axios.patch(`http://localhost:8081/api/shifts/${shiftID}`, updatedShift)
         .then(response => {
           console.log("signUpForShift action response: ", response)
           commit("signedUpShift", response.data)
+          signupObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)
         })
         .catch(error => {
           console.error("signUpForShift action error: ", error)
@@ -624,10 +721,12 @@ export default new Vuex.Store({
       let updatedShift = {
         VolunteerID: cancelObj.VolunteerID
       }
-      axios.put(`http://localhost:8081/api/shifts/cancel/${shiftID}`)
+      console.log("canceShift cancelObj: ", cancelObj)
+      axios.patch(`http://localhost:8081/api/cancel/shifts/${shiftID}`, updatedShift)
         .then(response => {
           console.log("cancelShift action response: ", response)
           commit("canceledShift", response.data)
+          cancelObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)
         })
         .catch(error => {
           console.error("cancelShift action error: ", error)
@@ -646,7 +745,28 @@ export default new Vuex.Store({
           commit("fetchTagsError")
         })
     },
-
+    login({ commit }, user) {
+      let userAttempt = {
+        Email: user.Email,
+        Password: user.Password,
+        UserType: user.UserType,
+      }
+      console.log()
+      axios.post(`http://localhost:8081/api/login`, userAttempt)
+        .then(response => {
+          console.log("login action respone: ", response)
+          const responseUser = response.data
+          responseUser.UserType = responseUser.NPOName ? "NPO" : "Volunteer"
+          commit("loginUser", responseUser)
+          user.router.push("/")
+          resolve(response)
+        })
+        .catch(error => {
+          console.error("login action error: ", error)
+          commit("loginError")
+          reject(error)
+        })
+    }
   },
   getters: {
     npoPastEvents(state) {
@@ -662,6 +782,93 @@ export default new Vuex.Store({
       return state.tags.map(tag => {
         return tag.TagName
       })
+    },
+    stringOfNpoEvents(state) {
+      if (state.npoEvents) {
+        return state.npoEvents.map(event => {
+          return moment(event.StartTime).format("YYYY-MM-DD")
+        })
+      }
+    },
+    filteredOpenEvents(state) {
+      //function to test if search string is included in event name
+      function includesName(event, string) {
+        return event.Name.toLowerCase().includes(string)
+      }
+      //function to test if search string is included in event description
+      function includesDescription(event, string) {
+        return event.Description.toLowerCase().includes(string)
+      }
+      //function to test if search string is included in event NPO Name
+      function includesNPOName(event, string) {
+        console.log(event.NPOName)
+        return event.NPOName.toLowerCase().includes(string)
+      }
+      //function to test if search string is included in event tags
+      function includesTag(event, string) {
+        let tags = event.Tags
+        for (let i = 0; i < tags.length; i++) {
+          let tag = tags[i]
+          if (tag.TagName.toLowerCase().includes(string)) {
+            return true
+          }
+        }
+      }
+      console.log("state.searchStartDate: ", state.searchStartDate)
+      let startDateConstraint = new Date(`${state.searchStartDate} 00:00:00`).getTime();
+      let endDateConstraint = new Date(`${state.searchEndDate} 23:59:00`).getTime();
+      console.log("endDateConstraint: ", endDateConstraint)
+
+      const opnEventsWithinDateSpan = !state.fetchingEvents ? state.openEvents.filter(event => {
+        let eventIsWithinDateConstraints = endDateConstraint >= event.StartTime && event.StartTime >= startDateConstraint
+        return eventIsWithinDateConstraints
+      }) : state.openEvents
+
+      console.log(opnEventsWithinDateSpan)
+
+      let trimmedLowerCaseSearchString = state.searchString.toLowerCase().trim()
+      let searchOption = state.searchOption
+      switch (searchOption) {
+        case "All":
+          return opnEventsWithinDateSpan.filter(event => {
+            let isNameIncluded = includesName(event, trimmedLowerCaseSearchString)
+            let isDescriptionIncluded = includesDescription(event, trimmedLowerCaseSearchString)
+            let isNPONameIncluded = includesNPOName(event, trimmedLowerCaseSearchString)
+            let isTagIncluded = includesTag(event, trimmedLowerCaseSearchString)
+            let anyIncluded = isNameIncluded || isDescriptionIncluded || isNPONameIncluded || isTagIncluded
+            return anyIncluded
+          })
+        case "Tags":
+          return opnEventsWithinDateSpan.filter(event => {
+            let isTagIncluded = includesTag(event, trimmedLowerCaseSearchString)
+            return isTagIncluded
+          })
+        case "Name":
+          return opnEventsWithinDateSpan.filter(event => {
+            let isNameIncluded = includesName(event, trimmedLowerCaseSearchString)
+            return isNameIncluded
+          })
+        case "Description":
+          return opnEventsWithinDateSpan.filter(event => {
+            let isDescriptionIncluded = includesDescription(event, trimmedLowerCaseSearchString)
+            return isDescriptionIncluded
+          })
+        case "Non Profit Organization":
+          return opnEventsWithinDateSpan.filter(event => {
+            let isNPONameIncluded = includesNPOName(event, trimmedLowerCaseSearchString)
+            return isNPONameIncluded
+          })
+      }
     }
   }
 });
+
+function persistUser(user) {
+  localStorage.setItem('id', user.ID)
+  localStorage.setItem('user_type', user.UserType)
+}
+
+function removePersistedUser() {
+  const items = ['id', 'user_type']
+  items.forEach(item => localStorage.removeItem(item))
+}

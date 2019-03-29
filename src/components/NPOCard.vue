@@ -19,9 +19,9 @@
         ></v-select>
         <v-autocomplete
           clearable
-          v-model="eventID"
+          v-model="eventName"
           item-text="Name"
-          item-value="ID"
+          item-value="Name"
           name="agency"
           :items="allEvents"
           label="Search Events"
@@ -34,11 +34,18 @@
               </template>
           </v-autocomplete>
           <v-btn 
-          v-if="npoLoggedIn"
+          v-if="npoLoggedIn && loggedInNPOisThisOne"
           color="primary"
-          :to="'/new/event/' + npo.ID" 
+          :to="'/new/event/' + Number(this.id)" 
           >
             Schedule New Event
+          </v-btn>
+          <v-btn 
+          v-if="npoLoggedIn && loggedInNPOisThisOne"
+          color="primary"
+          :to="'/calendar/npo/' + Number(this.id)" 
+          >
+            View Event Calendar
           </v-btn>
 
     <v-container grid-list-md>
@@ -71,8 +78,7 @@ export default {
   },
   data() {
     return {
-      npoLoggedIn: true,
-      eventID: undefined,
+      eventName: undefined,
       now: Date.now(),
       eventsType: "Upcoming",
       eventsSelect: ["Upcoming", "Past", "Both"]
@@ -82,6 +88,12 @@ export default {
     this.$store.dispatch("getOneNPO", this.id);
   },
   computed: {
+    npoLoggedIn() {
+      return localStorage.user_type === "NPO";
+    },
+    loggedInNPOisThisOne() {
+      return this.npoLoggedIn && Number(localStorage.id) === Number(this.id);
+    },
     npo() {
       return this.$store.state.npo;
     },
@@ -105,20 +117,22 @@ export default {
     },
     filteredEvents() {
       if (this.isBoth) {
-        if (this.eventID) {
-          return this.allEvents.filter(event => event.ID === this.eventID);
+        if (this.eventName) {
+          return this.allEvents.filter(event => event.Name === this.eventName);
         } else {
           return this.allEvents;
         }
       } else if (this.isPast) {
-        if (this.eventID) {
-          return this.pastEvents.filter(event => event.ID === this.eventID);
+        if (this.eventName) {
+          return this.pastEvents.filter(event => event.Name === this.eventName);
         } else {
           return this.pastEvents;
         }
       } else if (this.isUpcoming) {
-        if (this.eventID) {
-          return this.upcomingEvents.filter(event => event.ID === this.eventID);
+        if (this.eventName) {
+          return this.upcomingEvents.filter(
+            event => event.Name === this.eventName
+          );
         } else {
           return this.upcomingEvents;
         }

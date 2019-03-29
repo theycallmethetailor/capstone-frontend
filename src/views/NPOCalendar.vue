@@ -4,32 +4,6 @@
       xs12
       class="mb-3"
     >
-    <v-container>
-      <v-alert 
-        dismissible     
-        v-model="cancelShiftSuccess"
-        color="success"
-        icon="check_circle"
-        outline
-        mode="in-out"
-        transition="slide-x-transition"
-      >
-        Your shift for the event was cancelled successfully. 
-      </v-alert>
-    </v-container>
-    <v-container>
-      <v-alert 
-      dismissible     
-      v-model="signUpShiftSuccess"
-      color="success"
-      icon="check_circle"
-      outline
-      mode="in-out"
-      transition="slide-x-transition"
-    >
-      You have signed up for this event successfully!
-    </v-alert>
-    </v-container>
       <v-sheet height="500">
         <v-calendar
           ref="calendar"
@@ -40,10 +14,10 @@
         >
         <!-- Events slots -->
         <template v-slot:day="{ date }">
-            <template v-for="calEvent in shiftsMap[date]">
+            <template v-for="event in eventsMap[date]">
               <v-menu
-                :key="calEvent.EventID"
-                v-model="calEvent.open"
+                :key="event.ID"
+                v-model="event.open"
                 full-width
                 offset-x
               >
@@ -52,8 +26,9 @@
                     v-ripple
                     class="my-event"
                     v-on="on"
-                    v-html="calEvent.EventName"
-                  ></div>
+                  >
+                  {{ event.Name + ' ' + moment(event.StartTime).format('h:mm a') }}
+                  </div>
                 </template>
                 <v-card
                   color="grey lighten-4"
@@ -64,19 +39,19 @@
                     color="primary"
                     dark
                   >
-                    <v-toolbar-title v-html="calEvent.EventName"></v-toolbar-title>
+                    <v-toolbar-title> {{ event.Name + ' ' + moment(event.StartTime).format('h:mm a') }} </v-toolbar-title>
                     <v-spacer></v-spacer>
                   </v-toolbar>
                   <v-card-text>
-                      <h4> <v-icon left >event</v-icon>  {{ moment(calEvent.ActualStartTime).format("MMMM Do") }}  </h4>
-                      <h3> {{calEvent.NPOName}} </h3>
-                      <p>{{ calEvent.EventDescription }}</p>
+                      <h4> <v-icon left >event</v-icon>  {{ moment(event.StartTime).format("MMMM Do h:mm") }}  </h4>
+                      <h3> {{event.NPOName}} </h3>
+                      <p>{{ event.Description }}</p>
                   </v-card-text>
                   <v-card-actions>
                     <v-btn
                       flat
                       color="primary"
-                      @click="goToEvent(calEvent)"
+                      :to="'/event/' + event.ID"
                     >
                       View Event
                     </v-btn>
@@ -88,29 +63,31 @@
 
           <!-- the events at the top (all-day) -->
           <template v-slot:dayHeadere="{ date }">
-            <template v-for="calEvent in shiftsMap[date]">
+            <template v-for="event in eventsMap[date]">
               <!-- all day events don't have time -->
               <div
-                v-if="!calEvent.time"
-                :key="calEvent.EventID"
+                v-if="!event.time"
+                :key="event.ID"
                 class="my-event"
-                @click="open(calEvent)"
-                v-html="calEvent.EventName"
-              ></div>
+                @click="open(event)"
+              >
+              {{ event.Name + ' ' + moment(event.StartTime).format('h:mm a') }}
+              </div>
             </template>
           </template>
           <!-- the events at the bottom (timed) -->
           <template v-slot:dayBody="{ date, timeToY, minutesToPixels }">
-            <template v-for="calEvent in shiftsMap[date]">
+            <template v-for="event in eventsMap[date]">
               <!-- timed events -->
               <div
-                v-if="calEvent.time"
-                :key="calEvent.ID"
-                :style="{ top: timeToY(calEvent.time) + 'px', height: minutesToPixels(calEvent.Duration) + 'px' }"
+                v-if="event.time"
+                :key="event.ID"
+                :style="{ top: timeToY(event.time) + 'px', height: minutesToPixels(event.Duration) + 'px' }"
                 class="my-event with-time"
-                @click="open(calEvent)"
-                v-html="calEvent.EventName"
-              ></div>
+                @click="open(event)"
+              >
+              {{ event.Name + ' ' + moment(event.StartTime).format('h:mm a') }}
+              </div>
             </template>
           </template>
 
@@ -167,8 +144,8 @@
 import moment from "moment";
 
 export default {
-  name: "VolCalendar",
-  props: ["eventDate", "volID", "eventView"],
+  name: "NPOCalendar",
+  props: ["eventDate", "npoID"],
   data: () => {
     return {
       moment: moment,
@@ -184,51 +161,32 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("getVolunteer", localStorage.id); //take out hard coding once login/out added
+    this.$store.dispatch("getOneNPO", Number(this.npoID));
   },
   mounted() {
     this.$refs.calendar.scrollToTime("08:00");
   },
   computed: {
-    volunteer() {
-      return this.$store.state.volunteer;
+    npo() {
+      return this.$store.state.npo;
     },
     // convert the list of shifts into a map of lists keyed by date
-    shiftsMap() {
-      const shiftMap = {};
-      if (this.volunteer.Shifts) {
-        this.volunteer.Shifts.forEach(shift => {
-          (shiftMap[moment(shift.ActualStartTime).format("YYYY-MM-DD")] =
-            shiftMap[moment(shift.ActualStartTime).format("YYYY-MM-DD")] ||
-            []).push(shift);
+    eventsMap() {
+      const eventMap = {};
+      if (this.npo.Events) {
+        this.npo.Events.forEach(event => {
+          (eventMap[moment(event.StartTime).format("YYYY-MM-DD")] =
+            eventMap[moment(event.StartTime).format("YYYY-MM-DD")] || []).push(
+            event
+          );
         });
-        return shiftMap;
-      }
-    },
-    cancelShiftSuccess: {
-      get() {
-        return this.$store.state.cancelShiftSuccess;
-      },
-      set() {
-        this.$store.commit("resetVolCancelSuccessMessage");
-      }
-    },
-    signUpShiftSuccess: {
-      get() {
-        return this.$store.state.signUpShiftSuccess;
-      },
-      set() {
-        this.$store.commit("resetVolSignupSuccess");
+        return eventMap;
       }
     }
   },
   methods: {
     open(event) {
       alert(event.title);
-    },
-    goToEvent(calEvent) {
-      // this.$store.dispatch("resetAddEventSuccess");
-      this.$router.push(`/event/${calEvent.ID}`);
     }
   }
 };

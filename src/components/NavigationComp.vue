@@ -6,8 +6,10 @@
     <v-toolbar-items class="hidden-sm-and-down">
       <v-btn class="white--text" to="/" flat>Home</v-btn>
       <v-btn class="white--text" to="/about" flat>About</v-btn>
-      <v-btn class="white--text" to='/login' flat>Login</v-btn>
+      <v-btn v-if="!userLoggedIn" class="white--text" to='/login' flat>Login</v-btn>
       <v-btn class="white--text" to='/register' flat>Register</v-btn>
+      <v-btn v-if="userLoggedIn" class="white--text" @click="logout" flat>Logout</v-btn>
+
     </v-toolbar-items>
   </v-toolbar>
 </template>
@@ -18,6 +20,15 @@ export default {
   methods: {
     toggleDrawer() {
       this.$store.dispatch("toggleDrawer");
+    },
+    logout() {
+      console.log("logout method fired");
+      this.$store.commit("logout", this.$router);
+    }
+  },
+  computed: {
+    userLoggedIn() {
+      return localStorage.id ? true : false;
     }
   }
 };

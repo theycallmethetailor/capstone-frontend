@@ -2,6 +2,17 @@
     <v-container>
         <v-layout>
             <v-flex>
+                <!-- Event Added Sucessfully alert -->
+                <v-alert
+                  v-if="addEventSuccess"
+                  :value="true"
+                  color="success"
+                  icon="check_circle"
+                  outline
+                >
+                  Your event was created successfully!
+                </v-alert>
+
                 <EventCard :event="event" :eventView="true" />   
             </v-flex>
         </v-layout>
@@ -23,6 +34,9 @@ export default {
   computed: {
     event() {
       return this.$store.state.event;
+    },
+    addEventSuccess() {
+      return this.$store.state.addEventSuccess;
     }
   }
 };
