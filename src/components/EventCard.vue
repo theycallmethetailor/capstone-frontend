@@ -65,7 +65,8 @@
                   <v-container>
                     <v-layout>
                       <v-flex>
-                        <VolCalendar :eventView="true" :id="volunteerID" />
+                        <VolCalendar v-if="volunteerLoggedIn" :eventView="true" :id="volunteerID" />
+                        <NPOCalendar v-if="npoLoggedIn" :eventView="true" :npoID="npoID"  />
                       </v-flex>
                     </v-layout>
                   </v-container>
@@ -143,8 +144,14 @@ export default {
     volunteerLoggedIn() {
       return !!localStorage.id && localStorage.user_type === "Volunteer";
     },
+    npoLoggedIn() {
+      return !!localStorage.id && localStorage.user_type === "NPO";
+    },
     volunteerID() {
       return this.volunteerLoggedIn ? localStorage.id : null;
+    },
+    npoID() {
+      return this.npoLoggedIn ? localStorage.id : null;
     },
     volIsSignedUp() {
       if (this.event.Shifts && localStorage.user_type === "Volunteer") {

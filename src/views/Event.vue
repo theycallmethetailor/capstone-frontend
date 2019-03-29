@@ -4,11 +4,14 @@
             <v-flex>
                 <!-- Event Added Sucessfully alert -->
                 <v-alert
-                  v-if="addEventSuccess"
+                  dismissible
+                  v-model="addEventSuccess"
                   :value="true"
                   color="success"
                   icon="check_circle"
                   outline
+                  mode="in-out"
+                  transition="slide-x-transition"
                 >
                   Your event was created successfully!
                 </v-alert>
@@ -35,8 +38,13 @@ export default {
     event() {
       return this.$store.state.event;
     },
-    addEventSuccess() {
-      return this.$store.state.addEventSuccess;
+    addEventSuccess: {
+      get() {
+        return this.$store.state.addEventSuccess;
+      },
+      set() {
+        this.$store.commit("resetAddEventSuccess");
+      }
     }
   }
 };

@@ -6,6 +6,17 @@
         >
         Login
         </v-card-title>
+      <v-alert 
+        dismissible     
+        v-model="loginError"
+        color="error"
+        icon="check_circle"
+        outline
+        mode="in-out"
+        transition="slide-x-transition"
+      >
+        There was an error logging in. Please try again. 
+      </v-alert>
         <v-card-text>
             <v-form
             ref="loginForm"
@@ -51,6 +62,7 @@
                   </v-flex>
               </v-layout>
               <v-btn
+              :disabled="!valid"
               color="primary"
               @click="login"
               >
@@ -82,6 +94,16 @@ export default {
         emailMatch: () => "The email and password you entered don't match"
       }
     };
+  },
+  computed: {
+    loginError: {
+      get() {
+        return this.$store.state.loginError;
+      },
+      set() {
+        this.$store.commit("resetLoginError");
+      }
+    }
   },
   methods: {
     login() {

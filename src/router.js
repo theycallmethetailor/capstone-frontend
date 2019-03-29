@@ -25,11 +25,6 @@ export default new Router({
       component: () => import('./views/Login.vue')
     },
     {
-      path: '/register',
-      name: 'Register',
-      component: () => import('./views/Register.vue')
-    },
-    {
       path: '/event/:id',
       props: true,
       name: 'Event',

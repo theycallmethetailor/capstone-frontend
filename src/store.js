@@ -285,6 +285,15 @@ export default new Vuex.Store({
     addedVolunteer(state, newVolunteer) {
       state.addingVolunteer = false
       state.addVolunteerSuccess = true
+      state.loginSuccess = true
+      let loggedVolunteer = {
+        ...newVolunteer,
+        UserType: "Volunteer"
+      }
+      persistUser(loggedVolunteer)
+      state.loggedInUser = newVolunteer
+      state.loggedInUserRole = localStorage.user_type
+      state.loggedInUserID = localStorage.id
     },
     //UPDATE Volunteer
     updatingVolunteer(state) {
@@ -404,6 +413,9 @@ export default new Vuex.Store({
       state.loginSuccess = true
       persistUser(user)
       state.loggedInUser = user
+    },
+    resetLoginError() {
+      state.loginError = false
     },
     logout(state, router) {
       state.loggingIn = false
@@ -636,7 +648,7 @@ export default new Vuex.Store({
         })
     },
     //CREATE Volunteer
-    addVolunteer({ commit }, newVolunteer) {
+    addVolunteer({ commit }, newVolunteerObj) {
       //   example newVolunteer
       //  {
       //     "Username": "AwesomeUser",
@@ -646,11 +658,21 @@ export default new Vuex.Store({
       //     "LastName": "Me",
       //     "Password": "password"
       //   }
+      let newVolunteer = {
+        Email: newVolunteerObj.Email,
+        FirstName: newVolunteerObj.FirstName,
+        LastName: newVolunteerObj.LastName,
+        Bio: newVolunteerObj.Bio,
+        Username: newVolunteerObj.Username,
+        Password: newVolunteerObj.Password,
+        UserType: newVolunteerObj.userType,
+      }
       commit("addingVolunteer")
       axios.post(`http://localhost:8081/api/volunteers`, newVolunteer)
         .then(response => {
           console.log("addVolunteer action response: ", response)
           commit("addedVolunteer", response.data)
+          newVolunteerObj.router.push(`/volunteer/calendar/${response.data.ID}`)
         })
         .catch(error => {
           commit("addVolunteerError")
