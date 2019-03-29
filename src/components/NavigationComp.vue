@@ -8,7 +8,7 @@
       <v-btn class="white--text" to="/about" flat>About</v-btn>
       <v-btn v-if="userLoggedIn" class="white--text" :to="calendarPath" flat>My calendar</v-btn>      
       <v-btn v-if="!userLoggedIn" class="white--text" to='/login' flat>Sign In/Sign Up </v-btn>
-      <v-btn v-if="userLoggedIn" class="white--text" @click="logout" flat>Logout</v-btn>
+      <v-btn v-if="userLoggedIn" class="white--text" flat>Logout</v-btn>
 
     </v-toolbar-items>
   </v-toolbar>
@@ -17,6 +17,18 @@
 <script>
 export default {
   name: "NavigationComp",
+  mounted() {
+    if (localStorage.getItem("id")) {
+      this.userLoggedIn = true;
+    } else {
+      this.userLoggedIn = false;
+    }
+  },
+  watch: {
+    userLoggedIn(id) {
+      localStorage.id = id;
+    }
+  },
   methods: {
     toggleDrawer() {
       this.$store.dispatch("toggleDrawer");
@@ -27,8 +39,13 @@ export default {
     }
   },
   computed: {
-    userLoggedIn() {
-      return localStorage.id ? true : false;
+    userLoggedIn: {
+      get() {
+        return !!localStorage.getItem("id") || false;
+      },
+      set() {
+        this.$store.commit("logout", this.$router);
+      }
     },
     calendarPath() {
       if (this.userLoggedIn && localStorage.user_type === "Volunteer") {

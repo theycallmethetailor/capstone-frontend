@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import App from './App.vue';
 import router from './router';
-import store from './store';
+import store from './vuex/store';
 import 'vuetify/dist/vuetify.min.css';
 import colors from 'vuetify/es5/util/colors'
 import moment from 'moment'

@@ -75,12 +75,12 @@
               </v-layout>
             </v-container>
             <v-expansion-panel v-if="!eventView" inset>
-              <v-expansion-panel-content>
+              <v-expansion-panel-content class="secondary">
                 <template v-slot:header>
                   <h4>Description</h4>
                 </template>
-                <v-card color="secondary"  flat>
-                  <v-card-text class="white--text font-weight-thin" >
+                <v-card color="grey lighten-4"  flat>
+                  <v-card-text class="font-weight-thin" >
                     <p>{{event.Description}}</p>
                   </v-card-text>
                 </v-card>
