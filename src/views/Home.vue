@@ -2,7 +2,7 @@
 <div>
   <Parallax />
   <EventSearchToolbar />
-  <OpenEvents />
+  <OpenEvents transition="y-transition" mode="out-in" />
 </div>
 </template>
 

@@ -67,6 +67,7 @@
                       <v-flex>
                         <VolCalendar v-if="volunteerLoggedIn" :eventView="true" :id="volunteerID" />
                         <NPOCalendar v-if="npoLoggedIn" :eventView="true" :npoID="npoID"  />
+                        <LoggedOutCalendar v-if="!npoLoggedIn && !volunteerLoggedIn" :event="event" />
                       </v-flex>
                     </v-layout>
                   </v-container>
@@ -103,11 +104,15 @@
 import moment from "moment";
 import gmapsInit from "../utils/gmaps";
 import VolCalendar from "../views/VolCalendar.vue";
+import NPOCalendar from "../views/NPOCalendar.vue";
+import LoggedOutCalendar from "./LoggedOutCalendar.vue";
 export default {
   name: "EventCard",
   props: ["event", "index", "eventView", "npo"],
   components: {
-    VolCalendar
+    VolCalendar,
+    NPOCalendar,
+    LoggedOutCalendar
   },
   data() {
     return {

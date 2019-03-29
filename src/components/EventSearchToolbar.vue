@@ -8,7 +8,7 @@
         >  
             <template >
                 <v-layout justify-space-around wrap>
-                    <v-flex xs12 sm12 md12 lg4 xl4>
+                    <v-flex xs12 sm12 md12 lg3 xl3>
                         <v-text-field
                             v-model="searchString"
                             flat
@@ -89,7 +89,7 @@
                                 ></v-text-field>
                             </template>
                             <v-date-picker
-                            :min="today"
+                            :min="searchStartDate"
                             v-model="searchEndDate" 
                             scrollable
                             event-color="primary"
