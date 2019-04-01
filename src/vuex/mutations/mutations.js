@@ -2,12 +2,14 @@ import { persistUser, removePersistedUser } from '../../utils/persistUser'
 import eventMutations from './eventMutations'
 import npoMutations from './npoMutations'
 import volunteerMutations from './volunteerMutations'
+import reportMutations from './reportmutations'
 
 export default {
 
     ...eventMutations,
     ...npoMutations,
     ...volunteerMutations,
+    ...reportMutations,
     toggleDrawer(state) {
         state.drawer = !state.drawer
     },

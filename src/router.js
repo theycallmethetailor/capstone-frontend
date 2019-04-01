@@ -78,6 +78,15 @@ export const router = new Router({
         next();
       },
       component: () => import('./views/EditEvent.vue')
+    },
+    {
+      path: '/volunteer/report/:volID',
+      props: true,
+      name: "VolunteerReport",
+      meta: {
+        requiresAuth: true
+      },
+      component: () => import('./views/VolunteerReport.vue')
     }
   ],
   scrollBehavior(to, from, savedPosition) {

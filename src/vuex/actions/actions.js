@@ -2,6 +2,7 @@ import axios from 'axios'
 import eventActions from './eventActions'
 import npoActions from './npoActions'
 import volunteerActions from './volunteerActions'
+import reportActions from './reportactions'
 
 export const actions = {
     toggleDrawer({ commit }) {
@@ -10,6 +11,7 @@ export const actions = {
     ...eventActions,
     ...npoActions,
     ...volunteerActions,
+    ...reportActions,
     getAllTags({ commit }) {
         commit("fetchingTags")
         axios.get("http://localhost:8081/api/tags")

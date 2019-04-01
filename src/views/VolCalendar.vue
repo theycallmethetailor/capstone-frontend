@@ -240,9 +240,9 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   border-radius: 2px;
-  background-color: #1867c0;
+  background-color: #ff8a80;
   color: #ffffff;
-  border: 1px solid #1867c0;
+  border: 1px solid #ff8a80;
   font-size: 12px;
   padding: 3px;
   cursor: pointer;

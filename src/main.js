@@ -25,7 +25,7 @@ Vue.use(Vuetify, {
   theme: {
     primary: colors.teal.lighten1,
     secondary: colors.teal.lighten3,
-    accent: colors.shades.black,
+    accent: "#FF8A80",
     error: colors.red.accent3
   }
 })

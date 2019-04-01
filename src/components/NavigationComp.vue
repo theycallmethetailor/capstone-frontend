@@ -7,6 +7,7 @@
       <v-btn class="white--text" to="/" flat>Home</v-btn>
       <v-btn class="white--text" to="/about" flat>About</v-btn>
       <v-btn v-if="userLoggedIn" class="white--text" :to="calendarPath" flat>My calendar</v-btn>      
+      <v-btn v-if="volunteerLoggedIn" class="white--text" :to="'/volunteer/report/' + volunteerID" flat>My Hours</v-btn>      
       <v-btn v-if="!userLoggedIn" class="white--text" to='/login' flat>Sign In/Sign Up </v-btn>
       <v-btn v-if="userLoggedIn" @click="logout" class="white--text" flat>Logout</v-btn>
 
@@ -44,6 +45,14 @@ export default {
         };
         this.$store.commit("logout", necObj);
       }
+    },
+    volunteerLoggedIn() {
+      return (
+        this.userLoggedIn && this.$store.state.loggedInUserRole === "Volunteer"
+      );
+    },
+    volunteerID() {
+      return Number(this.$ls.get("id"));
     },
     calendarPath() {
       if (this.userLoggedIn && this.$ls.get("user_type") === "Volunteer") {

@@ -376,7 +376,7 @@ export default {
         ).getTime();
         let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
         let newEvent = {
-          NPOID: this.loggedInNPOID,
+          NPOID: Number(this.loggedInNPOID),
           Name: this.Name,
           StartTime: eventStart,
           EndTime: eventEnd,
@@ -405,9 +405,7 @@ export default {
       return this.$store.state.loggedInUserRole === "NPO";
     },
     loggedInNPOID() {
-      if (this.npoLoggedIn) {
-        return this.$store.state.loggedInUserID;
-      }
+      return this.$ls.get("id");
     },
     tagsNames() {
       return this.$store.getters.tagNames;

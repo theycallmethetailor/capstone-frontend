@@ -9,6 +9,13 @@ export default {
         ...eventState,
         ...npoState,
         ...volunteerState,
+        volReport: {},
+        HoursByNPO: {},
+        HoursByEvent: {},
+        HoursByTag: {},
+        fetchingVolReport: false,
+        fetchVolReportError: false,
+        fetchVolReportSuccess: false,
         //READ Tags
         tags: [],
         fetchingTags: false,
