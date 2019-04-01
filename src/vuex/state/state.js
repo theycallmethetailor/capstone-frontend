@@ -2,6 +2,7 @@ import moment from 'moment'
 import eventState from './eventState'
 import npoState from './npoState'
 import volunteerState from './volunteerState'
+import reportRequest from './reportRequest'
 
 export default {
     state: {
@@ -9,13 +10,7 @@ export default {
         ...eventState,
         ...npoState,
         ...volunteerState,
-        volReport: {},
-        HoursByNPO: {},
-        HoursByEvent: {},
-        HoursByTag: {},
-        fetchingVolReport: false,
-        fetchVolReportError: false,
-        fetchVolReportSuccess: false,
+        ...reportRequest,
         //READ Tags
         tags: [],
         fetchingTags: false,

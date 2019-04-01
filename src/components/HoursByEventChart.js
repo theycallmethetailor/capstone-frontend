@@ -36,20 +36,13 @@ export default {
             return this.$store.state.fetchingVolReport;
         },
         HoursByEventArray() {
-            let arrayOfData = Object.keys(this.HoursByEvent).map(EventID => {
-                return this.HoursByEvent[EventID];
-            });
-            return arrayOfData;
+            return this.$store.getters.HoursByEventArray
         },
         events() {
-            return this.HoursByEventArray.map(eventData => {
-                return eventData.EventName
-            })
+            return this.$store.getters.hoursEvents
         },
         eventData() {
-            return this.HoursByEventArray.map(eventData => {
-                return eventData.HoursWorked
-            })
+            return this.$store.getters.hoursEventData
         },
     }
 }

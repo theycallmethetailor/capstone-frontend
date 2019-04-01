@@ -29,27 +29,14 @@ export default {
     }
   },
   computed: {
-    HoursByNPO() {
-      return this.$store.state.HoursByNPO;
-    },
     fetchingVolReport() {
       return this.$store.state.fetchingVolReport;
     },
-    hoursByNPOArray() {
-      let arrayOfData = Object.keys(this.HoursByNPO).map(NPOID => {
-        return this.HoursByNPO[NPOID];
-      });
-      return arrayOfData;
-    },
     npos() {
-      return this.hoursByNPOArray.map(npoData => {
-        return npoData.NPOName
-      })
+      return this.$store.getters.hoursNPOs
     },
     npoData() {
-      return this.hoursByNPOArray.map(npoData => {
-        return npoData.HoursWorked
-      })
+      return this.$store.getters.hoursNPOData
     },
   }
 }

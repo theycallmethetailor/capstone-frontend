@@ -19,7 +19,7 @@
             <v-data-table
                 :search="searchString"
                 :headers="headers"
-                :items="hoursByNPOArray"
+                :items="HoursByNPO"
                 :loading="fetchingVolReport"
                 class="elevation-1"
             >   
@@ -83,17 +83,10 @@ export default {
     fetchingVolReport() {
       return this.$store.state.fetchingVolReport;
     },
-    hoursByNPOArray() {
-      let arrayOfData = Object.keys(this.HoursByNPO).map(NPOID => {
-        return this.HoursByNPO[NPOID];
-      });
-      return arrayOfData;
-    },
     HoursWorkedTotal() {
-      const total = this.hoursByNPOArray.reduce((acc, data) => {
+      const total = this.HoursByNPO.reduce((acc, data) => {
         return acc + data.HoursWorked;
       }, 0);
-      console.log(this.hoursByNPOArray);
       return total;
     }
   }

@@ -94,17 +94,11 @@ export default {
     };
   },
   computed: {
-    HoursByEvent() {
-      return this.$store.state.HoursByEvent;
-    },
     fetchingVolReport() {
       return this.$store.state.fetchingVolReport;
     },
     HoursByEventArray() {
-      let arrayOfData = Object.keys(this.HoursByEvent).map(EventID => {
-        return this.HoursByEvent[EventID];
-      });
-      return arrayOfData;
+      return this.$store.state.HoursByEvent;
     },
     HoursWorkedTotal() {
       const total = this.HoursByEventArray.reduce((acc, data) => {

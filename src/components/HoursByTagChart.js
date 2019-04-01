@@ -35,21 +35,11 @@ export default {
         fetchingVolReport() {
             return this.$store.state.fetchingVolReport;
         },
-        HoursByTagArray() {
-            let arrayOfData = Object.keys(this.HoursByTag).map(tagID => {
-                return this.HoursByTag[tagID];
-            });
-            return arrayOfData;
-        },
         tags() {
-            return this.HoursByTagArray.map(tagData => {
-                return tagData.TagName
-            })
+            return this.$store.getters.hoursTags
         },
         tagData() {
-            return this.HoursByTagArray.map(tagData => {
-                return tagData.HoursWorked
-            })
+            return this.$store.getters.hoursTagsData
         },
-    }
+    },
 }

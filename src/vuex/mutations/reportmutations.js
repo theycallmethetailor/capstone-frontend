@@ -15,5 +15,11 @@ export default {
         state.HoursByNPO = report.HoursByNPO
         state.HoursByEvent = report.HoursByEvent
         state.HoursByTag = report.HoursByTag
+    },
+    updateReportStartDate(state, newStartDate) {
+        state.reportStartDate = newStartDate
+    },
+    updateReportEndDate(state, newEndDate) {
+        state.reportStartDate = newEndDate
     }
 }

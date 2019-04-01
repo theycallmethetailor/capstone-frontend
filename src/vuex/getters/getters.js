@@ -22,6 +22,55 @@ export default {
             })
         }
     },
+    HoursByTagArray(state) {
+        let arrayOfData = state.HoursByTag.map(tag => {
+            return tag;
+        });
+        return arrayOfData;
+    },
+    hoursTags(state) {
+        let arrayOfData = state.HoursByTag.map(tag => {
+            return tag.TagName
+        });
+        return arrayOfData;
+    },
+    hoursTagsData(state) {
+        let arrayOfData = state.HoursByTag.map(tag => {
+            return tag.HoursWorked
+        });
+        return arrayOfData;
+    },
+    hoursNPOs(state) {
+        console.log(state.HoursByNPO)
+        let arrayOfData = state.HoursByNPO.map(npoData => {
+            return npoData.NPOName;
+        });
+        return arrayOfData
+    },
+    hoursNPOData(state) {
+        let arrayOfData = state.HoursByNPO.map(npoData => {
+            return npoData.HoursWorked;
+        });
+        return arrayOfData
+    },
+    HoursByEventArray(state) {
+        let arrayOfData = state.HoursByEvent.map(event => {
+            return event;
+        });
+        return arrayOfData;
+    },
+    hoursEvents(state) {
+        let arrayOfData = state.HoursByEvent.map(eventDat => {
+            return eventDat.EventName;
+        });
+        return arrayOfData
+    },
+    hoursEventData(state) {
+        let arrayOfData = state.HoursByEvent.map(eventData => {
+            return eventData.HoursWorked;
+        });
+        return arrayOfData
+    },
     filteredOpenEvents(state) {
         //function to test if search string is included in event name
         function includesName(event, string) {

@@ -120,19 +120,6 @@ export default {
       today: new Date().toISOString().substr(0, 10)
     };
   },
-  //   data() {
-  //     return {
-  //       searchString: "",
-  //       searchOption: "All",
-  //       searchOptions: [
-  //         "All",
-  //         "Tags",
-  //         "Name",
-  //         "Description",
-  //         "Non Profit Organization"
-  //       ]
-  //     };
-  //   },
   computed: {
     searchString: {
       get() {

@@ -3,7 +3,8 @@
     <v-layout>
       <v-flex>
         <h1>Volunteer Hour Report</h1>
-        <VolReportTabs />
+        <VolReportReqToolbar />
+        <VolReportTabs v-if="fetchVolReportSuccess" />
       </v-flex>
     </v-layout>
   </v-container>
@@ -12,11 +13,14 @@
 <script>
 import moment from "moment";
 import VolReportTabs from "@/components/VolReportTabs.vue";
+import VolReportReqToolbar from "@/components/VolReportReqToolbar.vue";
+
 export default {
   name: "VolunteerReport",
   props: ["volID"],
   components: {
-    VolReportTabs
+    VolReportTabs,
+    VolReportReqToolbar
   },
   created() {
     this.fetchReport();
@@ -28,29 +32,27 @@ export default {
     volunteerID() {
       return this.$ls.get("id");
     },
-    volReport() {
-      return this.$store.state.volReport;
+    reportStartDate() {
+      return this.$store.state.reportStartDate;
     },
-    HoursByNPO() {
-      return this.$store.state.HoursByNPO;
+    reportEndDate() {
+      return this.$store.state.reportEndDate;
     },
-    HoursByEvent() {
-      return this.$store.state.HoursByEvent;
+    fetchingVolReport() {
+      return this.$store.state.fetchingVolReport;
     },
-    HoursByTag() {
-      return this.$store.state.HoursByTag;
+    fetchVolReportSuccess() {
+      return this.$store.state.fetchVolReportSuccess;
     }
   },
   methods: {
     fetchReport() {
-      const reportRequestBody = {
+      let reportRequestBody = {
         UserType: "Volunteer",
         VolunteerID: Number(this.$ls.get("id")),
-        StartDate: moment()
-          .subtract(4, "month")
-          .valueOf(),
-        EndDate: moment()
-          .add(4, "month")
+        StartDate: moment(this.reportStartDate).valueOf(),
+        EndDate: moment(this.reportEndDate)
+          .endOf("day")
           .valueOf()
       };
       this.$store.dispatch("getVolunteerReport", reportRequestBody);
