@@ -7,15 +7,47 @@
         New Event
         </v-card-title>
         <v-card-text>
+            <!-- Alerts Section -->
+            <v-layout>
+                <v-flex>
+                    <!-- success -->
+                    <v-alert
+                    v-model="updateEventSuccess"
+                    dismissible
+                    mode="out-in"
+                    transition="slide-x-transition"
+                    color="success"
+                    icon="check_circle"
+                    outline
+                    >
+                    Your changes were saved successfully.
+                    </v-alert>
+                    <!-- error -->
+                    <v-alert
+                    v-model="updateEventError"
+                    dismissible
+                    mode="out-in"
+                    transition="slide-x-transition"
+                    color="error"
+                    icon="warning"
+                    outline
+                    >
+                    There was an error saving your changes.
+                    </v-alert>
+                </v-flex>
+            </v-layout>
+
             <v-form
-            ref="newEventForm"
+            ref="updateEventForm"
             v-model="valid"
             lazy-validation
+            :loading="fetchingEvent"
             >
               <!-- Event Name input -->
               <v-layout justify-space-around>
                 <v-flex xs12 sm11 md11 xl11>
                   <v-text-field
+                    :loading="fetchingEvent"
                     v-model="Name"
                     :rules="nameRules"
                     :count="25"
@@ -29,6 +61,7 @@
               <v-layout justify-space-around>
                 <v-flex xs12 sm11 md11 xl11>
                   <v-text-field
+                    :loading="fetchingEvent"
                     v-model="NumOfVolunteers"
                     :rules="volNumRules"
                     prepend-icon="people"
@@ -42,6 +75,7 @@
               <v-layout justify-space-around>
                 <v-flex xs12 sm11 md11 lg11 xl11>
                   <v-textarea
+                    :loading="fetchingEvent"
                     v-model="Description"
                     :rules="descriptionRules"
                     :count="1000"
@@ -57,7 +91,9 @@
               <v-layout justify-space-around>
                 <v-flex xs12 sm11 md11 lg11 xl11 >
                   <vuetify-google-autocomplete
-                    hint="Please type in and select the correct address from the dropdown."
+                    :loading="fetchingEvent"
+                      hint="Please type in and select the correct address from the dropdown."
+                      v-model="Address"
                       :rules="addressRules"
                       label="Event Address"
                       prepend-icon="add_location"
@@ -128,6 +164,7 @@
                     >
                       <template v-slot:activator="{ on }">
                         <v-text-field
+                          :loading="fetchingEvent"
                           :rules="startDateRules"
                           v-model="startDate"
                           label="Event Start Date"
@@ -161,6 +198,7 @@
                     >
                       <template v-slot:activator="{ on }">
                         <v-text-field
+                          :loading="fetchingEvent"
                           :rules="startTimeRules"
                           v-model="StartTime"
                           label="Event Start Time"
@@ -198,6 +236,7 @@
                     >
                       <template v-slot:activator="{ on }">
                         <v-text-field
+                          :loading="fetchingEvent"
                           :rules="endDateRules"
                           v-model="endDate"
                           label="Event End Date"
@@ -233,6 +272,7 @@
                     >
                       <template v-slot:activator="{ on }">
                         <v-text-field
+                          :loading="fetchingEvent"
                           :rules="endTimeRules"
                           v-model="EndTime"
                           label="Event End Time"
@@ -257,11 +297,18 @@
               </template>
               <!-- Submit Button -->
               <v-btn
+              :loading="updatingEvent || fetchingEvent"
               :disabled="!valid" 
               color="primary"
-              @click="addEvent"
+              @click="updateEvent"
               >
-                Submit
+                Save Changes
+              </v-btn>
+              <v-btn
+              :loading="updatingEvent"
+                @click="goToEvent"
+              >
+                  View Event
               </v-btn>
             </v-form>
         </v-card-text>
@@ -281,43 +328,39 @@
 import moment from "moment";
 import AddingEventsStatusCard from "./AddingEventsStatusCard.vue";
 export default {
-  name: "NewEventForm",
-  props: ["npoID"],
+  name: "EditEventForm",
+  props: ["npoID", "eventID"],
   components: {
     AddingEventsStatusCard
   },
   created() {
+    this.$store.dispatch("getEvent");
     this.$store.dispatch("getAllTags");
     this.$store.dispatch("getOneNPO", Number(this.loggedInNPOID));
   },
   data() {
     return {
       valid: false,
-      NPOID: this.loggedInNPOID,
+      NPOID: this.npoID,
       eventErroDialog: false,
-      Name: "",
       nameRules: [
         v => !!v || "Event Name is required",
         v => (v && v.length <= 25) || "Name must be less than 25 characters"
       ],
-      NumOfVolunteers: 1,
       volNumRules: [
         v => !!v || "Number of Volunteers Required",
         v => v > 0 || "Must be at least one (1) volunteer"
       ],
-      Description: "",
       descriptionRules: [
         v => !!v || "Event Description is required",
         v =>
           (v && v.length <= 1000) ||
           "Description must be less than 1000 characters"
       ],
-      Address: "",
       addressRules: [
         v => !!v || "Event Address is required",
         v => v.split(",").length - 1 === 3 || "Please use a valid address"
       ],
-      Tags: [],
       tagsRules: [
         v => !!v || "Event Tags are required",
         v => (v && v.length <= 5) || "Please enter no more than 5 tags."
@@ -325,9 +368,7 @@ export default {
       search: null,
       startTimeModal: false,
       endTimeModal: false,
-      StartTime: "07:00",
       startTimeRules: [v => !!v || "Start Date is required"],
-      EndTime: "07:00",
       endTimeRules: [
         v => !!v || "End Date is required",
         v => {
@@ -346,9 +387,7 @@ export default {
       arrayEvents: null,
       startDateModal: false,
       endDateModal: false,
-      startDate: new Date().toISOString().substr(0, 10),
       startDateRules: [v => !!v || "Start Date is required"],
-      endDate: new Date().toISOString().substr(0, 10),
       endDateRules: [
         v => {
           let endTimeStamp = moment(`${this.endDate}`).valueOf();
@@ -362,20 +401,26 @@ export default {
     };
   },
   methods: {
+    goToEvent() {
+      this.$store.dispatch("resetAddEventSuccess");
+      this.$router.push(`/event/${this.event.ID}`);
+    },
     getAddressData: function(addressData, placeResultData, id) {
+      console.log(placeResultData);
       if (placeResultData.formatted_address) {
         this.Address = placeResultData.formatted_address;
       }
     },
-    addEvent() {
-      this.$refs.newEventForm.validate();
-      if (this.$refs.newEventForm.validate()) {
+    updateEvent() {
+      this.$refs.updateEventForm.validate();
+      if (this.$refs.updateEventForm.validate()) {
         // this.addingEventDialog = true;
         let eventStart = new Date(
           `${this.startDate} ${this.StartTime}:00`
         ).getTime();
         let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
-        let newEvent = {
+        let updatedEvent = {
+          ID: this.event.ID,
           NPOID: this.loggedInNPOID,
           Name: this.Name,
           StartTime: eventStart,
@@ -385,8 +430,10 @@ export default {
           Location: this.Address,
           NumOfVolunteers: Number(this.NumOfVolunteers)
         };
-        console.log(newEvent);
-        this.$store.dispatch("addEvent", { newEvent, router: this.$router });
+        this.$store.dispatch("updateEvent", {
+          updatedEvent,
+          router: this.$router
+        });
         // .then(() => {
         //   if (this.addEventError) this.eventErroDialog = true;
         // });
@@ -401,6 +448,73 @@ export default {
     }
   },
   computed: {
+    event() {
+      return this.$store.state.event;
+    },
+    eventToUpdate() {
+      return this.$store.state.eventToUpdate;
+    },
+    Name: {
+      get() {
+        return this.event.Name;
+      },
+      set(val) {
+        this.$store.state.eventToUpdate.Name = val;
+      }
+    },
+    Description: {
+      get() {
+        return this.event.Description;
+      },
+      set(val) {
+        this.$store.state.eventToUpdate.Description = val;
+      }
+    },
+    NumOfVolunteers: {
+      get() {
+        return this.event.NumOfVolunteers;
+      },
+      set(val) {
+        this.$store.state.eventToUpdate.NumOfVolunteers = val;
+      }
+    },
+    Address: {
+      get() {
+        return this.event.Location;
+      },
+      set(val) {
+        this.$store.state.eventToUpdate.Location = val;
+      }
+    },
+    Tags: {
+      get() {
+        return this.event.Tags.map(tag => tag.TagName);
+      },
+      set(val) {
+        this.$store.state.eventToUpdate.Tags = val;
+      }
+    },
+    StartTime() {
+      return moment(this.event.StartTime).format("HH:mm");
+    },
+    EndTime() {
+      return moment(this.event.EndTime).format("HH:mm");
+    },
+    startDate() {
+      return moment(this.event.StartTime).format("YYYY-MM-DD");
+    },
+    endDate() {
+      return moment(this.event.EndTime).format("YYYY-MM-DD");
+    },
+    fetchingEvent() {
+      return this.$store.state.fetchingEvent;
+    },
+    fetchEventError() {
+      return this.$store.state.fetchEventError;
+    },
+    fetchEventSuccess() {
+      return this.$store.state.fetchEventSuccess;
+    },
     npoLoggedIn() {
       return this.$store.state.loggedInUserRole === "NPO";
     },
@@ -443,8 +557,24 @@ export default {
         return "00:00";
       }
     },
-    addEventError() {
-      return this.$store.state.addEventError;
+    updatingEvent() {
+      return this.$store.state.updatingEvent;
+    },
+    updateEventError: {
+      get() {
+        return this.$store.state.updateEventError;
+      },
+      set() {
+        this.$store.commit("resetUpdateEventError");
+      }
+    },
+    updateEventSuccess: {
+      get() {
+        return this.$store.state.updateEventSuccess;
+      },
+      set() {
+        this.$store.commit("resetUpdateEventSuccess");
+      }
     }
   }
 };

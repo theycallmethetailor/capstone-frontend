@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
+import store from './vuex/store'
 
 Vue.use(Router);
 
-export default new Router({
+export const router = new Router({
   routes: [
     {
       path: '/',
@@ -28,6 +29,10 @@ export default new Router({
       path: '/event/:id',
       props: true,
       name: 'Event',
+      beforeRouteEnter(to, from, next) {
+        store.dispatch("getEvent", Number(to.params.id));
+        next();
+      },
       component: () => import('./views/Event.vue')
     },
     {
@@ -46,13 +51,70 @@ export default new Router({
       path: '/calendar/npo/:npoID',
       props: true,
       name: 'NPOCalendar',
+      beforeRouteEnter(to, from, next) {
+        store.dispatch("getOneNPO", Number(to.params.npoID));
+        next();
+      },
       component: () => import('./views/NPOCalendar.vue')
     },
     {
       path: '/new/event/:npoID',
       props: true,
       name: 'NewEvent',
+      meta: {
+        requiresAuth: true
+      },
       component: () => import('./views/NewEvent.vue')
+    },
+    {
+      path: '/event/edit/:eventID/:npoID',
+      props: true,
+      name: "EditEvent",
+      meta: {
+        requiresAuth: true
+      },
+      beforeRouteEnter(to, from, next) {
+        store.dispatch("getEvent", Number(to.params.eventID));
+        next();
+      },
+      component: () => import('./views/EditEvent.vue')
     }
   ],
+  scrollBehavior(to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (store.state.loggedInUserID) {
+      next()
+      return
+    }
+    next('/login')
+  } else {
+    const isLoginRoute = to.fullPath === "/login"
+    if (store.state.loggedInUserID && isLoginRoute) {
+      next('/')
+    } else {
+      next()
+    }
+  }
+})
+
+// router.beforeEach((to, from, next) => {
+//   if (to.matched.some(record => record.meta.requiresNPOAuth)) {
+//     if (store.state.loggedInUserID && store.state.loggedInUserRole === "NPO" && record.npoID === store.state.loggedInUserID) {
+//       next()
+//       return
+//     }
+//     next('/login')
+//   } else {
+//     const isLoginRoute = to.fullPath === "/login"
+//     if (store.state.loggedInUserID && isLoginRoute) {
+//       next('/')
+//     } else {
+//       next()
+//     }
+//   }
+// })

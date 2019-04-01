@@ -43,7 +43,7 @@ export default {
             })
     },
     //CREATE NPO
-    addNPOs({ commit }, newNPO) {
+    addNPOs({ commit }, newNPOObj) {
         // example newNPO
         // {
         //   "NPOName": "Organization",
@@ -54,12 +54,23 @@ export default {
         //   "LastName": "Rodriguez",
         //   "Password": "3247980"
         // }
+        let newNPO = {
+            Email: newNPOObj.Email,
+            FirstName: newNPOObj.FirstName,
+            LastName: newNPOObj.LastName,
+            Description: newNPOObj.Description,
+            NPOName: newNPOObj.NPOName,
+            Password: newNPOObj.Password,
+            UserType: newNPOObj.userType,
+        }
         commit("addingNPO")
         axios.post(`http://localhost:8081/api/npos`, newNPO)
             .then(response => {
                 console.log("addNPO action response: ", response)
-                commit("addedNPO")
-
+                const npoToAdd = response.data
+                npoToAdd.ls = newNPOObj.ls
+                commit("addedNPO", npoToAdd)
+                newNPOObj.router.push(`/calendar/npo/${response.data.ID}`)
             })
             .catch(error => {
                 console.error("addNPO action error: ", error)

@@ -4,7 +4,9 @@
     <NavigationComp />
     <v-content>
       <v-container fluid>
-        <router-view></router-view>
+        <transition name="slide">
+          <router-view></router-view>
+        </transition>
       </v-container>
     </v-content>
     <v-footer app></v-footer>

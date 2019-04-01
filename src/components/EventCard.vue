@@ -40,7 +40,6 @@
                     <v-layout row >
                         <v-flex>
                             <h4>Event Location: {{event.Location}} </h4> 
-                            <div v-if="eventView" id="map"></div>
                             <v-layout>
                               <v-flex>
                                 <v-card  flat>
@@ -51,6 +50,7 @@
                                     <p>{{event.Description}}</p>
                                   </v-card-text>
                                 </v-card>
+                                <div v-if="eventView" id="map"></div>
                               </v-flex>
 
                             </v-layout>
@@ -92,9 +92,11 @@
         </v-card-text>
 
         <v-card-actions>
-            <v-btn v-if="!eventView" @click="goToEvent" flat color="primary">Volunteer</v-btn>
+            <v-btn v-if="!eventView" @click="goToEvent" flat color="primary">View Event</v-btn>
             <v-btn v-if="eventView && volunteerLoggedIn && !!firstOpenShift && !volIsSignedUp" @click="volSignUp" flat color="primary">Sign Up</v-btn>
-            <v-btn v-if=" eventView && volunteerLoggedIn  && volIsSignedUp" @click="volCancelShift" flat color="error">Cancel Shift</v-btn>
+            <v-btn v-if="eventView && !volunteerLoggedIn && !npoLoggedIn" to="/login" >Sign Up</v-btn>
+            <v-btn v-if="eventView && volunteerLoggedIn  && volIsSignedUp" @click="volCancelShift" flat color="error">Cancel Shift</v-btn>
+            <v-btn v-if="eventView && isLoggedInNPOsEvent" :to="'/event/edit/' + event.ID + '/' + event.NPOID" >Edit Event</v-btn>
 
         </v-card-actions>
     </v-card>
@@ -146,26 +148,40 @@ export default {
   //   }
   // },
   computed: {
+    loggedInUserRole() {
+      return this.$store.state.loggedInUserRole;
+    },
     volunteerLoggedIn() {
-      return !!this.$ls.id && this.$ls.user_type === "Volunteer";
+      return (
+        !!this.$store.state.loggedInUserID &&
+        this.loggedInUserRole === "Volunteer"
+      );
     },
     npoLoggedIn() {
-      return !!this.$ls.id && this.$ls.user_type === "NPO";
+      return (
+        !!this.$store.state.loggedInUserID && this.loggedInUserRole === "NPO"
+      );
+    },
+    isLoggedInNPOsEvent() {
+      return (
+        this.npoLoggedIn &&
+        Number(this.event.NPOID) === Number(this.$store.state.loggedInUserID)
+      );
     },
     volunteerID() {
-      return this.volunteerLoggedIn ? this.$ls.id : null;
+      return this.volunteerLoggedIn ? this.$store.state.loggedInUserID : null;
     },
     npoID() {
-      return this.npoLoggedIn ? this.$ls.id : null;
+      return this.npoLoggedIn ? this.$store.state.loggedInUserID : null;
     },
     volIsSignedUp() {
-      if (this.event.Shifts && this.$ls.user_type === "Volunteer") {
-        return (
-          // !!this.$store.state.volunteer &&
-          !!this.event.Shifts.filter(
-            shift => Number(shift.VolunteerID) === Number(this.$ls.id)
-          ).length
-        );
+      if (
+        this.event.Shifts &&
+        this.$store.state.loggedInUserRole === "Volunteer"
+      ) {
+        return !!this.event.Shifts.filter(
+          shift => Number(shift.VolunteerID) === Number(this.volunteerID)
+        ).length;
       }
     },
     eventTags() {
@@ -216,16 +232,17 @@ export default {
     volSignUp() {
       let signupObj = {
         ID: this.firstOpenShift.ID,
-        VolunteerID: this.$ls.id,
+        VolunteerID: this.volunteerID,
         router: this.$router
       };
       this.$store.dispatch("signUpForShift", signupObj);
     },
     volCancelShift() {
       let cancelOb = {
-        ID: this.event.Shifts.find(event => event.VolunteerID === this.$ls.id)
-          .ID,
-        VolunteerID: this.$ls.id,
+        ID: this.event.Shifts.find(
+          event => event.VolunteerID === this.volunteerID
+        ).ID,
+        VolunteerID: this.volunteerID,
         router: this.$router
       };
       this.$store.dispatch("cancelShift", cancelOb);

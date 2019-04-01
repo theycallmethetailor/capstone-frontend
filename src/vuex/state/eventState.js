@@ -7,7 +7,8 @@ export default {
     fetchEventsSuccess: false,
     //READ event (SHOW)
     event: {},
-    fetchEvent: false,
+    eventShifts: [],
+    fetchingEvent: false,
     fetchEventError: false,
     fetchEventSuccess: false,
     //CREATE event
@@ -15,6 +16,7 @@ export default {
     addEventError: false,
     addEventSuccess: false,
     //UPDATE event
+    eventToUpdate: {},
     updatingEvent: false,
     updateEventError: false,
     updateEventSuccess: false,

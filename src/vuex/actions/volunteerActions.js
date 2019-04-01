@@ -1,4 +1,5 @@
 import axios from 'axios'
+import moment from 'moment'
 
 export default {
     //READ volunteer
@@ -108,6 +109,7 @@ export default {
             })
             .catch(error => {
                 console.error("signUpForShift action error: ", error)
+                console.error("signUpForShift action response error: ", response)
                 commit("signUpShiftError")
             })
     },

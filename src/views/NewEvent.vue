@@ -2,7 +2,7 @@
     <v-container>
         <v-layout>
             <v-flex>
-                <NewEventForm :npoID="Number(npoID)" />
+                <NewEventForm :npoID="numberNPOID" />
             </v-flex>
         </v-layout>
     </v-container>
@@ -15,6 +15,11 @@ export default {
   props: ["npoID"],
   components: {
     NewEventForm
+  },
+  computed: {
+    numberNPOID() {
+      return Number(this.$store.state.loggedInUserID);
+    }
   }
 };
 </script>

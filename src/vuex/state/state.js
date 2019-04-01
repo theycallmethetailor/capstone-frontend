@@ -30,8 +30,8 @@ export default {
         loggingIn: false,
         loginError: false,
         loginSuccess: true,
-        loggedInUser: {},
-        loggedInUserRole: localStorage.user_type,
-        loggedInUserID: localStorage.id,
+
+        loggedInUserRole: localStorage.getItem('user_type'),
+        loggedInUserID: localStorage.getItem('id')
     },
 }

@@ -62,6 +62,13 @@
                     >
                       View Event
                     </v-btn>
+                    <v-btn
+                      flat
+                      color="primary"
+                      @click="routeToEditEvent(event)"
+                    >
+                      Edit Event
+                    </v-btn>
                   </v-card-actions>
                 </v-card>
               </v-menu>
@@ -174,6 +181,15 @@ export default {
     this.$refs.calendar.scrollToTime("08:00");
   },
   computed: {
+    npoLoggedIn() {
+      return (
+        !!this.$store.state.logginUserID &&
+        !!this.$store.state.logginUserRole === "NPO"
+      );
+    },
+    loggedInNPOIsCalendarNPO() {
+      return !!this.$store.state.logginUserID === Number(this.npoID);
+    },
     npo() {
       return this.$store.state.npo;
     },
@@ -200,6 +216,9 @@ export default {
   methods: {
     open(event) {
       alert(event.title);
+    },
+    routeToEditEvent(event) {
+      this.$router.push(`/event/edit/${event.ID}/${event.NPOID}`);
     }
   }
 };

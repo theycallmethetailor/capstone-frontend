@@ -29,6 +29,8 @@ module.exports = {
         state.fetchingEvent = false
         state.fetchEventSuccess = true
         state.event = event
+        state.eventToUpdate = event
+        state.eventShifts = event.Shifts
     },
     //CREATE event
     addingEvent(state) {
@@ -41,10 +43,14 @@ module.exports = {
         state.addEventError = true
     },
     addedEvent(state, newEvent) {
-        console.log("addedEvent mutation newEvent: ", newEvent)
         state.addingEvent = false
         state.addEventSuccess = true
-        state.openEvents.push(newEvent)
+        if (state.openEvents) {
+            state.openEvents.push(newEvent)
+        } else {
+            state.openEvents = [newEvent]
+        }
+
     },
     resetAddEventSuccess(state) {
         state.addEventSuccess = false
@@ -67,9 +73,30 @@ module.exports = {
         //may need to look into also updating assoicated shifts
         state.openEvents.forEach(event => {
             if (event.ID === updatedEvent.ID) {
-                event = updatedEvent
+                event.NPOID = updatedEvent.NPOID
+                event.Name = updatedEvent.Name
+                event.StartTime = updatedEvent.StartTime
+                event.EndTime = updatedEvent.EndTime
+                event.Tags = updatedEvent.Tags
+                event.Description = updatedEvent.Description
+                event.Location = updatedEvent.Location
+                event.NumOfVolunteers = updatedEvent.NumOfVolunteers
             }
             return event
         })
+        state.event.NPOID = updatedEvent.NPOID
+        state.event.Name = updatedEvent.Name
+        state.event.StartTime = updatedEvent.StartTime
+        state.event.EndTime = updatedEvent.EndTime
+        state.event.Tags = updatedEvent.Tags
+        state.event.Description = updatedEvent.Description
+        state.event.Location = updatedEvent.Location
+        state.event.NumOfVolunteers = updatedEvent.NumOfVolunteers
     },
+    resetUpdateEventSuccess(state) {
+        state.updateEventSuccess = !state.updateEventSuccess
+    },
+    resetUpdateEventError(state) {
+        state.resetUpdateEventError = !state.resetUpdateEventError
+    }
 }

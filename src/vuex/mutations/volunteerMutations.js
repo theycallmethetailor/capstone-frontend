@@ -33,7 +33,6 @@ export default {
             UserType: "Volunteer"
         }
         persistUser(loggedVolunteer, newVolunteer.ls)
-        state.loggedInUser = newVolunteer
         state.loggedInUserRole = newVolunteer.ls.get('user_type')
         state.loggedInUserID = newVolunteer.ls.get('id')
     },

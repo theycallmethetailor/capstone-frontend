@@ -17,7 +17,7 @@ export default {
     //READ event (SHOW)
     getEvent({ commit }, eventID) {
         commit("fetchingEvent")
-        axios.get(`http://localhost:8081/api/events/${eventID}`)
+        axios.get(`http://localhost:8081/api/event/${eventID}`)
             .then(response => {
                 console.log("getEvent action response: ", response)
                 commit('fetchedEvent', response.data)
@@ -59,7 +59,7 @@ export default {
             })
     },
     //UPDATE event
-    updateEvent({ commit }, updatedEvent) {
+    updateEvent({ commit }, updatedEventObj) {
         //   example updatedEvent: 
         //   {
         //     "ID": 10,
@@ -76,6 +76,18 @@ export default {
         //     "NumOfVolunteers": 2,
         //     "Shifts": null
         // }
+        console.log("this is the updatedEventObj: ", updatedEventObj)
+        const updatedEvent = {
+            ID: updatedEventObj.updatedEvent.ID,
+            NPOID: updatedEventObj.updatedEvent.NPOID,
+            Name: updatedEventObj.updatedEvent.Name,
+            StartTime: updatedEventObj.updatedEvent.StartTime,
+            EndTime: updatedEventObj.updatedEvent.EndTime,
+            Tags: updatedEventObj.updatedEvent.Tags,
+            Description: updatedEventObj.updatedEvent.Description,
+            Location: updatedEventObj.updatedEvent.Location,
+            NumOfVolunteers: updatedEventObj.updatedEvent.NumOfVolunteers
+        }
         commit("updatingEvent")
         axios.patch(`http://localhost:8081/api/events/${updatedEvent.ID}`, updatedEvent)
             .then(response => {

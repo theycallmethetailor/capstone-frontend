@@ -48,23 +48,23 @@ export default {
     },
     loginUser(state, user) {
         console.log("loginUser mutation user: ", user)
+        persistUser(user, user.ls)
         state.loggingIn = false
         state.loginSuccess = true
-        persistUser(user, user.ls)
-        state.loggedInUser = user
+        state.loggedInUserRole = user.UserType
+        state.loggedInUserID = user.ID
     },
     resetLoginError(state) {
         state.loginError = false
     },
     logout(state, obj) {
+        console.log("logout mutation called: ", obj)
+        removePersistedUser(obj.ls)
         state.loggingIn = false
         state.loginError = false
         state.loginSuccess = true
-        state.loggedInUser = {}
-        state.loggedInUserRole = ""
-        state.loggedInUserID = 0
-        removePersistedUser(obj.ls)
-        // console.log("localstorage.id", )
+        state.loggedInUserRole = null
+        state.loggedInUserID = null
         obj.router.push("/")
 
     },

@@ -1,3 +1,5 @@
+import moment from "moment"
+
 export default {
     npoPastEvents(state) {
         console.log(state.npoEvents)
@@ -49,7 +51,7 @@ export default {
         let endDateConstraint = new Date(`${state.searchEndDate} 23:59:00`).getTime();
         console.log("endDateConstraint: ", endDateConstraint)
 
-        const opnEventsWithinDateSpan = !state.fetchingEvents ? state.openEvents.filter(event => {
+        const opnEventsWithinDateSpan = !state.fetchingEvents && state.openEvents ? state.openEvents.filter(event => {
             let eventIsWithinDateConstraints = endDateConstraint >= event.StartTime && event.StartTime >= startDateConstraint
             return eventIsWithinDateConstraints
         }) : state.openEvents

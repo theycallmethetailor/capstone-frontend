@@ -1,3 +1,5 @@
+import { persistUser, removePersistedUser } from "../../utils/persistUser"
+
 export default {
     // READ NPOs
     fetchingNPOs(state) {
@@ -40,9 +42,17 @@ export default {
         state.addingNPO = false
         state.addNPOError = true
     },
-    addedNPO(state) {
+    addedNPO(state, newNPO) {
         state.addingNPO = false
         state.addNPOSuccess = true
+        state.loginSuccess = true
+        let loggedInNPO = {
+            ...newNPO,
+            UserType: "NPO"
+        }
+        persistUser(loggedInNPO, newNPO.ls)
+        state.loggedInUserRole = loggedInNPO.UserType
+        state.loggedInUserID = loggedInNPO.ID
     },
     //UPDATE NPO
     updatingNPO(state) {

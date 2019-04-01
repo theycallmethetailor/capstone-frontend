@@ -8,7 +8,7 @@
       <v-btn class="white--text" to="/about" flat>About</v-btn>
       <v-btn v-if="userLoggedIn" class="white--text" :to="calendarPath" flat>My calendar</v-btn>      
       <v-btn v-if="!userLoggedIn" class="white--text" to='/login' flat>Sign In/Sign Up </v-btn>
-      <v-btn v-if="userLoggedIn" class="white--text" flat>Logout</v-btn>
+      <v-btn v-if="userLoggedIn" @click="logout" class="white--text" flat>Logout</v-btn>
 
     </v-toolbar-items>
   </v-toolbar>
@@ -17,6 +17,7 @@
 <script>
 export default {
   name: "NavigationComp",
+
   methods: {
     toggleDrawer() {
       this.$store.dispatch("toggleDrawer");
@@ -33,7 +34,8 @@ export default {
   computed: {
     userLoggedIn: {
       get() {
-        return !!this.$ls.get("id", false);
+        console.log("userLoggedIn getter: ", this.$store.state.loggedInUserID);
+        return !!this.$store.state.loggedInUserID;
       },
       set() {
         let necObj = {
