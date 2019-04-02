@@ -1,16 +1,16 @@
-import { Bar } from 'vue-chartjs'
+import { Pie } from 'vue-chartjs'
 
 export default {
-    extends: Bar,
-    name: "HoursByTagChart",
+    extends: Pie,
+    name: "HoursByEventPieChart",
     mounted() {
         this.renderChart({
-            labels: this.tags,
+            labels: this.events,
             datasets: [
                 {
-                    label: "Hours By Tag",
+                    label: "Hours By Event",
                     backgroundColor: this.colorOptions,
-                    data: this.tagData,
+                    data: this.eventData,
                 }
             ]
         }, this.options)
@@ -29,29 +29,32 @@ export default {
         }
     },
     computed: {
-        HoursByTag() {
-            return this.$store.state.HoursByTag;
+        HoursByEvent() {
+            return this.$store.state.HoursByEvent;
         },
         fetchingVolReport() {
             return this.$store.state.fetchingVolReport;
         },
-        tags() {
-            return this.$store.getters.hoursTags
+        HoursByEventArray() {
+            return this.$store.getters.HoursByEventArray
         },
-        tagData() {
-            return this.$store.getters.hoursTagsData
+        events() {
+            return this.$store.getters.hoursEvents
+        },
+        eventData() {
+            return this.$store.getters.hoursEventData
         },
         colorOptions() {
             let options = ["#E0F2F1", "#FF8A80", "#B2EBF2"]
-            if (options.length < this.tags.length) {
+            if (options.length < this.events.length) {
                 let newOptions = []
                 let colorIndex = 0
-                for (let i = 0; i < this.tags.length; i++) {
+                for (let i = 0; i < this.events.length; i++) {
                     if (colorIndex > options.length - 1) {
                         colorIndex = 0
                     }
 
-                    if (newOptions[i - 1] === options[colorIndex] || (newOptions[0] === options[colorIndex] && i === this.tags.length - 1)) {
+                    if (newOptions[i - 1] === options[colorIndex] || (newOptions[0] === options[colorIndex] && i === this.events.length - 1)) {
                         colorIndex++
                         newOptions.push(options[colorIndex])
                     } else {
@@ -64,5 +67,5 @@ export default {
 
             return options
         }
-    },
+    }
 }

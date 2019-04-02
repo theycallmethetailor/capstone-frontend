@@ -13,7 +13,7 @@
                         <v-flex
                         xs12
                         sm12
-                        md12
+                        md3
                         lg3
                         xl3
                         > 
@@ -50,7 +50,7 @@
                         <v-flex
                         xs12
                         sm12
-                        md12
+                        md3
                         lg3
                         xl3
                         > 
@@ -87,7 +87,7 @@
                         <v-flex
                         xs12
                         sm12
-                        md12
+                        md3
                         lg3
                         xl3
                         >

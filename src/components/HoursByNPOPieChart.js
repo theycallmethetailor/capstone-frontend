@@ -1,16 +1,16 @@
-import { Bar } from 'vue-chartjs'
+import { Pie } from 'vue-chartjs'
 
 export default {
-    extends: Bar,
-    name: "HoursByTagChart",
+    extends: Pie,
+    name: "HoursByNPOPieChart",
     mounted() {
         this.renderChart({
-            labels: this.tags,
+            labels: this.npos,
             datasets: [
                 {
-                    label: "Hours By Tag",
+                    label: "Hours By NPO",
                     backgroundColor: this.colorOptions,
-                    data: this.tagData,
+                    data: this.npoData,
                 }
             ]
         }, this.options)
@@ -29,29 +29,26 @@ export default {
         }
     },
     computed: {
-        HoursByTag() {
-            return this.$store.state.HoursByTag;
-        },
         fetchingVolReport() {
             return this.$store.state.fetchingVolReport;
         },
-        tags() {
-            return this.$store.getters.hoursTags
+        npos() {
+            return this.$store.getters.hoursNPOs
         },
-        tagData() {
-            return this.$store.getters.hoursTagsData
+        npoData() {
+            return this.$store.getters.hoursNPOData
         },
         colorOptions() {
             let options = ["#E0F2F1", "#FF8A80", "#B2EBF2"]
-            if (options.length < this.tags.length) {
+            if (options.length < this.npos.length) {
                 let newOptions = []
                 let colorIndex = 0
-                for (let i = 0; i < this.tags.length; i++) {
+                for (let i = 0; i < this.npos.length; i++) {
                     if (colorIndex > options.length - 1) {
                         colorIndex = 0
                     }
 
-                    if (newOptions[i - 1] === options[colorIndex] || (newOptions[0] === options[colorIndex] && i === this.tags.length - 1)) {
+                    if (newOptions[i - 1] === options[colorIndex] || (newOptions[0] === options[colorIndex] && i === this.npos.length - 1)) {
                         colorIndex++
                         newOptions.push(options[colorIndex])
                     } else {
@@ -64,5 +61,5 @@ export default {
 
             return options
         }
-    },
+    }
 }

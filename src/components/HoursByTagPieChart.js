@@ -1,16 +1,16 @@
-import { Bar } from 'vue-chartjs'
+import { Pie } from 'vue-chartjs'
 
 export default {
-    extends: Bar,
-    name: "HoursByTagChart",
+    extends: Pie,
+    name: "HoursByTagPieChart",
     mounted() {
         this.renderChart({
             labels: this.tags,
             datasets: [
                 {
                     label: "Hours By Tag",
-                    backgroundColor: this.colorOptions,
                     data: this.tagData,
+                    backgroundColor: this.colorOptions
                 }
             ]
         }, this.options)

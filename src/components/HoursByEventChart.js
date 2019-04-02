@@ -9,7 +9,7 @@ export default {
             datasets: [
                 {
                     label: "Hours By Event",
-                    backgroundColor: "#FF8A80",
+                    backgroundColor: this.colorOptions,
                     data: this.eventData,
                 }
             ]
@@ -44,5 +44,28 @@ export default {
         eventData() {
             return this.$store.getters.hoursEventData
         },
+        colorOptions() {
+            let options = ["#E0F2F1", "#FF8A80", "#B2EBF2"]
+            if (options.length < this.events.length) {
+                let newOptions = []
+                let colorIndex = 0
+                for (let i = 0; i < this.events.length; i++) {
+                    if (colorIndex > options.length - 1) {
+                        colorIndex = 0
+                    }
+
+                    if (newOptions[i - 1] === options[colorIndex] || (newOptions[0] === options[colorIndex] && i === this.events.length - 1)) {
+                        colorIndex++
+                        newOptions.push(options[colorIndex])
+                    } else {
+                        newOptions.push(options[colorIndex])
+                        colorIndex++
+                    }
+                }
+                return newOptions
+            }
+
+            return options
+        }
     }
 }

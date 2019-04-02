@@ -20,9 +20,12 @@
       >
         <v-card flat>
           <v-container>
-            <v-layout justify-center>
-              <v-flex xs10 sm10 md6 lg6 xl6>
+            <v-layout justify-space-around wrap>
+              <v-flex xs10 sm10 md12 lg5 xl5>
                <HoursByNPOChart />
+              </v-flex>
+              <v-flex xs10 sm10 md12 lg5 xl5>
+              <HoursByNPOPieChart/>
 
               </v-flex>
             </v-layout>
@@ -36,13 +39,16 @@
       <v-tab-item>
           <v-card flat>
           <v-container>
-            <v-layout justify-center>
-              <v-flex xs10 sm10 md6 lg6 xl6>
+            <v-layout justify-space-around wrap>
+              <v-flex xs10 sm10 md12 lg5 xl5>
                <HoursByEventChart />
+              </v-flex>
 
+              <v-flex xs10 sm10 md12 lg5 xl5>
+                <HoursByEventPieChart />
               </v-flex>
             </v-layout>
-          </v-container> 
+          </v-container>  
               <HoursByEventTable />
           </v-card>
       </v-tab-item>
@@ -51,10 +57,13 @@
           <v-card flat>
 
           <v-container>
-            <v-layout justify-center>
-              <v-flex xs10 sm10 md6 lg6 xl6>
+            <v-layout justify-space-around wrap>
+              <v-flex xs10 sm10 md12 lg5 xl5>
                <HoursByTagChart />
+              </v-flex>
 
+              <v-flex xs10 sm10 md12 lg5 xl5>
+                <HoursByTagPieChart />
               </v-flex>
             </v-layout>
           </v-container> 
@@ -69,20 +78,26 @@
 <script>
 import HoursByNPOTable from "./HoursByNPOTable.vue";
 import HoursByNPOChart from "./HoursByNPOChart";
+import HoursByNPOPieChart from "./HoursByNPOPieChart";
 import HoursByEventTable from "./HoursByEventTable.vue";
 import HoursByEventChart from "./HoursByEventChart";
+import HoursByEventPieChart from "./HoursByEventPieChart";
 import HoursByTagTable from "./HoursByTagTable.vue";
 import HoursByTagChart from "./HoursByTagChart";
+import HoursByTagPieChart from "./HoursByTagPieChart";
 
 export default {
   name: "VolReportTabs",
   components: {
     HoursByNPOTable,
     HoursByNPOChart,
+    HoursByNPOPieChart,
     HoursByEventTable,
     HoursByEventChart,
+    HoursByEventPieChart,
     HoursByTagTable,
-    HoursByTagChart
+    HoursByTagChart,
+    HoursByTagPieChart
   },
   data() {
     return {
