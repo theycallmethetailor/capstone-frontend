@@ -49,7 +49,6 @@ export default {
         state.loginError = true
     },
     loginUser(state, user) {
-        console.log("loginUser mutation user: ", user)
         persistUser(user, user.ls)
         state.loggingIn = false
         state.loginSuccess = true
@@ -60,7 +59,6 @@ export default {
         state.loginError = false
     },
     logout(state, obj) {
-        console.log("logout mutation called: ", obj)
         removePersistedUser(obj.ls)
         state.loggingIn = false
         state.loginError = false

@@ -16,7 +16,6 @@ export const actions = {
         commit("fetchingTags")
         axios.get("http://localhost:8081/api/tags")
             .then(response => {
-                console.log("getAllTags action response: ", response)
                 commit("fetchedTags", response.data)
             })
             .catch(error => {
@@ -32,7 +31,6 @@ export const actions = {
         }
         axios.post(`http://localhost:8081/api/login`, userAttempt)
             .then(response => {
-                console.log("login action respone: ", response)
                 const responseUser = response.data
                 responseUser.UserType = responseUser.NPOName ? "NPO" : "Volunteer"
                 responseUser.ls = user.ls

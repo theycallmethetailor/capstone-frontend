@@ -4,7 +4,6 @@ export const persistUser = function (user, local) {
 }
 
 export const removePersistedUser = function (local) {
-    console.log("removePersistedUser functrion called: ", local)
     const items = ['id', 'user_type']
     items.forEach(item => local.remove(item))
 }

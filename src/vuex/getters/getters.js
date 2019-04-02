@@ -2,7 +2,6 @@ import moment from "moment"
 
 export default {
     npoPastEvents(state) {
-        console.log(state.npoEvents)
         const now = Date.now()
         return state.npoEvents.filter(event => event.EndTime < now)
     },
@@ -41,7 +40,6 @@ export default {
         return arrayOfData;
     },
     hoursNPOs(state) {
-        console.log(state.HoursByNPO)
         let arrayOfData = state.HoursByNPO.map(npoData => {
             return npoData.NPOName;
         });
@@ -82,7 +80,6 @@ export default {
         }
         //function to test if search string is included in event NPO Name
         function includesNPOName(event, string) {
-            console.log(event.NPOName)
             return event.NPOName.toLowerCase().includes(string)
         }
         //function to test if search string is included in event tags
@@ -95,17 +92,14 @@ export default {
                 }
             }
         }
-        console.log("state.searchStartDate: ", state.searchStartDate)
         let startDateConstraint = new Date(`${state.searchStartDate} 00:00:00`).getTime();
         let endDateConstraint = new Date(`${state.searchEndDate} 23:59:00`).getTime();
-        console.log("endDateConstraint: ", endDateConstraint)
 
         const opnEventsWithinDateSpan = !state.fetchingEvents && state.openEvents ? state.openEvents.filter(event => {
             let eventIsWithinDateConstraints = endDateConstraint >= event.StartTime && event.StartTime >= startDateConstraint
             return eventIsWithinDateConstraints
         }) : state.openEvents
 
-        console.log(opnEventsWithinDateSpan)
 
         let trimmedLowerCaseSearchString = state.searchString.toLowerCase().trim()
         let searchOption = state.searchOption

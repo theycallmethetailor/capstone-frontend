@@ -117,7 +117,6 @@ export default {
           router: this.$router,
           ls: this.$ls
         };
-        console.log("this.$ls", this.$ls);
         this.$store.dispatch("login", user);
       }
     }

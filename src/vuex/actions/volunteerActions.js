@@ -7,7 +7,6 @@ export default {
         commit("fetchingVolunteer")
         axios.get(`http://localhost:8081/api/volunteer/${volunteerID}`)
             .then(response => {
-                console.log("getVolunteer action response: ", response)
                 let volunteer = response.data
                 volunteer.Shifts = volunteer.Shifts ? volunteer.Shifts.map(shift => {
                     return {
@@ -25,15 +24,6 @@ export default {
     },
     //CREATE Volunteer
     addVolunteer({ commit }, newVolunteerObj) {
-        //   example newVolunteer
-        //  {
-        //     "Username": "AwesomeUser",
-        //     "Bio": "I want to volunteer for some reason.",
-        //     "Email": "email2354798@emailer.com",
-        //     "FirstName": "Mandy",
-        //     "LastName": "Me",
-        //     "Password": "password"
-        //   }
         let newVolunteer = {
             Email: newVolunteerObj.Email,
             FirstName: newVolunteerObj.FirstName,
@@ -46,7 +36,6 @@ export default {
         commit("addingVolunteer")
         axios.post(`http://localhost:8081/api/volunteers`, newVolunteer)
             .then(response => {
-                console.log("addVolunteer action response: ", response)
                 commit("addedVolunteer", response.data)
                 newVolunteerObj.router.push(`/volunteer/calendar/${response.data.ID}`)
             })
@@ -58,7 +47,6 @@ export default {
         commit("updatingVolunteer")
         axios.patch(`http://localhost:8081/api/volunteers/${updatedVolunteer.ID}`)
             .then(response => {
-                console.log("updateVolunteer action response: ", response)
                 commit("updatedVolunteer", response.data)
             })
             .catch(error => {
@@ -71,7 +59,6 @@ export default {
         commit("deletingVolunteer")
         axios.delete(`http://localhost:8081/api/volunteers/${volunteerID}`)
             .then(response => {
-                console.log("deleteVolunteer action response: ", response)
                 commit("deletedVolunteer")
             })
             .catch(error => {
@@ -84,7 +71,6 @@ export default {
         commit("fetchingVolShifts")
         axios.get(`http://localhost:8081/api/shifts/volunteers/${volunteer.ID}`)
             .then(response => {
-                console.log("getAllVolunteerShifts action response: ", response)
                 commit("fetchedVolShifts", response.data)
             })
             .catch(error => {
@@ -96,14 +82,11 @@ export default {
     signUpForShift({ commit }, signupObj) {
         commit("signingUpShift")
         let shiftID = signupObj.ID
-        console.log("signUpForShift action shiftID: ", shiftID)
         let updatedShift = {
             VolunteerID: Number(signupObj.VolunteerID)
         }
-        console.log("signUpForShift action updatedShift: ", updatedShift)
         axios.patch(`http://localhost:8081/api/shifts/${shiftID}`, updatedShift)
             .then(response => {
-                console.log("signUpForShift action response: ", response)
                 commit("signedUpShift", response.data)
                 signupObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)
             })
@@ -120,10 +103,8 @@ export default {
         let updatedShift = {
             VolunteerID: cancelObj.VolunteerID
         }
-        console.log("canceShift cancelObj: ", cancelObj)
         axios.patch(`http://localhost:8081/api/cancel/shifts/${shiftID}`, updatedShift)
             .then(response => {
-                console.log("cancelShift action response: ", response)
                 commit("canceledShift", response.data)
                 cancelObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)
             })

@@ -580,7 +580,6 @@ export default {
       this.$router.push(`/event/${this.event.ID}`);
     },
     getAddressData: function(addressData, placeResultData, id) {
-      console.log(placeResultData);
       if (placeResultData.formatted_address) {
         this.Address = placeResultData.formatted_address;
       }
@@ -588,7 +587,6 @@ export default {
     updateEvent() {
       this.$refs.updateEventForm.validate();
       if (this.$refs.updateEventForm.validate()) {
-        // this.addingEventDialog = true;
         let eventStart = new Date(
           `${this.startDate} ${this.StartTime}:00`
         ).getTime();

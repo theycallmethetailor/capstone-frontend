@@ -329,7 +329,6 @@ export default {
   },
   methods: {
     register() {
-      console.log("refistration was called!");
       if (this.userType === "Volunteer") {
         this.$refs.volunteerRegistrationForm.validate();
         if (this.$refs.volunteerRegistrationForm.validate()) {
@@ -347,7 +346,6 @@ export default {
           this.$store.dispatch("addVolunteer", newUserObj);
         }
       } else if (this.userType === "NPO") {
-        console.log("register method was called.");
         this.$refs.npoRegistrationForm.validate();
         if (this.$refs.npoRegistrationForm.validate()) {
           let newUserObj = {
@@ -364,9 +362,6 @@ export default {
           this.$store.dispatch("addNPOs", newUserObj);
         }
       }
-    },
-    registerNPO() {
-      console.log("registerNPO was called!");
     }
   }
 };

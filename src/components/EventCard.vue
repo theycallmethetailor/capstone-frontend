@@ -22,6 +22,14 @@
           You are already signed up for this shift.
         </v-alert>
         <v-alert
+          :value="eventView && volunteerHasConflictingShift && !volIsSignedUp"
+          color="info"
+          icon="info"
+          outline
+        >
+          You already have a shift that conflicts with this event. Please review your calendar below.
+        </v-alert>
+        <v-alert
           :value="volunteerNeedsToConfirmShift"
           color="info"
           icon="info"
@@ -42,23 +50,35 @@
                 <small v-if="!eventView" class="text-center"> {{event.Location}} </small>
             </div>
             <v-container v-if="eventView">
-              <v-layout>
+              <v-layout row wrap >
                 <v-flex xs12 sm12 md6 lg6 xl6>
                 <v-container>
-                    <v-layout row >
+                    <v-layout >
                         <v-flex>
-                            <h4>Event Location: {{event.Location}} </h4> 
+                            <v-container>
+                              <v-layout>
+                                <v-flex>
+                                  <h4>Event Location: {{event.Location}} </h4> 
+                                </v-flex>
+                              </v-layout>
+                            </v-container>
                             <v-layout>
                               <v-flex>
-                                <v-card  flat>
-                                  <v-card-title>
+                                <v-container>
+                                  <v-layout>
+                                    <v-flex>
+                                      <div v-if="eventView" id="map"></div>
+                                    </v-flex>
+                                  </v-layout>
+                                </v-container>
+                                <v-card color="grey lighten-4" flat>
+                                  <v-card-title class="secondary title ">
                                     <h4>Description</h4>
                                   </v-card-title>
                                   <v-card-text >
                                     <p>{{event.Description}}</p>
                                   </v-card-text>
                                 </v-card>
-                                <div v-if="eventView" id="map"></div>
                               </v-flex>
 
                             </v-layout>
@@ -66,8 +86,8 @@
                         </v-flex>
                     </v-layout>
                 </v-container>
-
                 </v-flex>
+
                 <v-flex xs12 sm12 md6 lg6 xl6>
                   <h4 v-if="eventView" > This event is from {{ startDateLong }} to {{endDateLong}} </h4>
                   <v-container>
@@ -89,23 +109,26 @@
                   <h4>Description</h4>
                 </template>
                 <v-card color="grey lighten-4"  flat>
-                  <v-card-text class="font-weight-thin" >
+                  <v-card-text>
                     <p>{{event.Description}}</p>
                   </v-card-text>
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
             <p v-if="eventView" > {{filledAndOpenShifts.filled  }} of {{ filledAndOpenShifts.needed }} shifts filled. </p>
-            <p class="grey--text" > Tags:  {{eventTags}} </p>
+            <v-container>
+            <p class="font-weight-thin" > Tags:  {{eventTags}} </p>
+
+            </v-container>
         </v-card-text>
 
         <v-card-actions>
-            <v-btn v-if="!eventView" @click="goToEvent" flat color="primary">View Event</v-btn>
-            <v-btn v-if="eventView && volunteerLoggedIn && !!firstOpenShift && !volIsSignedUp" @click="volSignUp" flat color="primary">Sign Up</v-btn>
-            <v-btn v-if="eventView && !volunteerLoggedIn && !npoLoggedIn" to="/login" >Sign Up</v-btn>
-            <v-btn v-if="eventView && volunteerLoggedIn  && volIsSignedUp && !volunteerNeedsToConfirmShift" @click="volCancelShift" flat color="error">Cancel Shift</v-btn>
+            <v-btn v-if="!eventView" @click="goToEvent" color="primary">View Event</v-btn>
+            <v-btn v-if="eventView && volunteerLoggedIn && !!firstOpenShift && !volIsSignedUp && !volunteerHasConflictingShift" @click="volSignUp" color="primary">Sign Up</v-btn>
+            <v-btn v-if="eventView && !volunteerLoggedIn && !npoLoggedIn" color="primary" to="/login" >Sign Up</v-btn>
+            <v-btn v-if="eventView && volunteerLoggedIn  && volIsSignedUp && !volunteerNeedsToConfirmShift" @click="volCancelShift" color="error">Cancel Shift</v-btn>
             <v-btn v-if="eventView && volunteerNeedsToConfirmShift" color="primary" @click="volConfirmShift" > Confirm Shift </v-btn>
-            <v-btn v-if="eventView && isLoggedInNPOsEvent" :to="'/event/edit/' + event.ID + '/' + event.NPOID" >Edit Event</v-btn>
+            <v-btn v-if="eventView && isLoggedInNPOsEvent" color="primary" :to="'/event/edit/' + event.ID + '/' + event.NPOID" >Edit Event</v-btn>
 
         </v-card-actions>
     </v-card>
@@ -119,7 +142,7 @@ import NPOCalendar from "../views/NPOCalendar.vue";
 import LoggedOutCalendar from "./LoggedOutCalendar.vue";
 export default {
   name: "EventCard",
-  props: ["event", "index", "eventView", "npo"],
+  props: ["event", "index", "eventView", "npo", "eventID"],
   components: {
     VolCalendar,
     NPOCalendar,
@@ -135,6 +158,11 @@ export default {
         position: {}
       }
     };
+  },
+  created() {
+    if (this.$ls.get("user_type") === "Volunteer") {
+      this.$store.dispatch("getVolunteer", Number(this.$ls.get("id")));
+    }
   },
   // async mounted() {
   //   try {
@@ -175,6 +203,16 @@ export default {
     volunteerNeedsToConfirmShift() {
       if (this.volunteersShift) {
         return this.volunteersShift.WasWorked === false && this.eventHasPassed;
+      }
+    },
+    volunteerHasConflictingShift() {
+      if (this.volunteerLoggedIn) {
+        return !!this.$store.state.volunteerShifts.filter(shift => {
+          return (
+            shift.ActualStartTime >= this.event.StartTime ||
+            shift.ActualStartTime <= this.event.EndTime
+          );
+        });
       }
     },
     loggedInUserRole() {

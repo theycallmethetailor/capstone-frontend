@@ -134,7 +134,6 @@ export default {
         return this.$store.state.searchOption;
       },
       set(value) {
-        console.log(value);
         this.$store.commit("updatesearchOption", value);
       }
     },
@@ -143,8 +142,6 @@ export default {
         return this.$store.state.searchStartDate;
       },
       set(value) {
-        // // let unixStartDate = new Date(`${value} 00:00:00`).getTime();
-        // value.slice();
         this.$store.commit("updateSearchStartDate", value);
       }
     },

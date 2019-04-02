@@ -29,6 +29,7 @@
     >
       You have signed up for this event successfully!
     </v-alert>
+    <h1>Event Calendar</h1>
     </v-container>
       <v-sheet height="500">
         <v-calendar
@@ -81,7 +82,7 @@
                     <v-spacer></v-spacer>
                   </v-toolbar>
                   <v-card-text>
-                      <h4> <v-icon left >event</v-icon>  {{ moment(calEvent.ActualStartTime).format("MMMM Do") }}  </h4>
+                      <h4> <v-icon left >event</v-icon>  {{ moment(calEvent.ActualStartTime).format("MMMM Do YYYY, h:mm a") }}  to {{ moment(calEvent.ActualEndTIme).format("MMMM Do YYYY, h:mm a") }} </h4>
                       <h3> {{calEvent.NPOName}} </h3>
                       <p>{{ calEvent.EventDescription }}</p>
                   </v-card-text>
@@ -89,7 +90,8 @@
                     <v-btn
                       flat
                       color="primary"
-                      @click="goToEvent(calEvent)"
+                      @click="$router.push(`/event/${calEvent.EventID}`)"
+
                     >
                       View Event
                     </v-btn>

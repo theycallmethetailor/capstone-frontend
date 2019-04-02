@@ -16,11 +16,9 @@ export default {
                         return response.data.HoursByTag[TagID];
                     }),
                 }
-                console.log("getVolunteerReport action report: ", report)
                 commit("fetchedVolReport", report)
             })
             .catch(error => {
-                console.log("getVolunteerReport action error, ", error)
                 commit("fetchVolReportError")
             })
     }

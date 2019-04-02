@@ -1,7 +1,7 @@
 <template>
   <v-toolbar color="primary" class="white--text">
     <v-toolbar-side-icon @click="toggleDrawer" class="white--text"></v-toolbar-side-icon>
-    <v-toolbar-title>Title</v-toolbar-title>
+    <v-toolbar-title>Volunteer Connect</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items class="hidden-sm-and-down">
       <v-btn class="white--text" to="/" flat>Home</v-btn>
@@ -31,7 +31,6 @@ export default {
       this.$store.dispatch("toggleDrawer");
     },
     logout() {
-      console.log("logout method fired");
       let necObj = {
         router: this.$router,
         ls: this.$ls
@@ -45,7 +44,6 @@ export default {
     },
     userLoggedIn: {
       get() {
-        console.log("userLoggedIn getter: ", this.$store.state.loggedInUserID);
         return !!this.$store.state.loggedInUserID;
       },
       set() {

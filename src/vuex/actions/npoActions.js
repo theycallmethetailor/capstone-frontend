@@ -6,7 +6,6 @@ export default {
         commit("fetchingNPOs")
         axios.get(`http://localhost:8081/api/npos`)
             .then(response => {
-                console.log("getNPO action response: ", response)
                 commit("fetchedNPOs", response.data)
             })
             .catch(error => {
@@ -19,14 +18,6 @@ export default {
         commit("fetchingOneNPO")
         axios.get(`http://localhost:8081/api/npo/${npoID}`)
             .then(response => {
-
-                // let volunteer = response.data
-                // volunteer.Shifts = volunteer.Shifts ? volunteer.Shifts.map(shift => {
-                //   return {
-                //     ...shift,
-                //     time: moment(shift.ActualStartTime).format('kk:mm')
-                //   }
-                // }) : []
                 let npo = response.data
                 npo.Events = npo.Events ? npo.Events.map(event => {
                     return {
@@ -34,7 +25,6 @@ export default {
                         time: moment(event.StartTime).format(`'kk:mm'`)
                     }
                 }) : []
-                console.log("getOneNPO action response: ", npo)
                 commit("fetchedOneNPO", response.data)
             })
             .catch(error => {
@@ -44,16 +34,6 @@ export default {
     },
     //CREATE NPO
     addNPOs({ commit }, newNPOObj) {
-        // example newNPO
-        // {
-        //   "NPOName": "Organization",
-        //   "Description": "Insert description of an NPO here.",
-        //   "Website": "www.google.com",
-        //   "Email": "clararodriguez@email.com",
-        //   "FirstName": "Clara",
-        //   "LastName": "Rodriguez",
-        //   "Password": "3247980"
-        // }
         let newNPO = {
             Email: newNPOObj.Email,
             FirstName: newNPOObj.FirstName,
@@ -66,7 +46,6 @@ export default {
         commit("addingNPO")
         axios.post(`http://localhost:8081/api/npos`, newNPO)
             .then(response => {
-                console.log("addNPO action response: ", response)
                 const npoToAdd = response.data
                 npoToAdd.ls = newNPOObj.ls
                 commit("addedNPO", npoToAdd)
@@ -79,21 +58,9 @@ export default {
     },
     //UPDATE NPO
     updateNPO({ commit }, updatedNPO) {
-        // example updatedNPO: 
-        // {
-        //   "ID": 19,
-        //   "NPOName": "New NPO Name",
-        //   "Description": "Insert description of an NPO here. New details.",
-        //   "Website": "www.google.com",
-        //   "Email": "newemailaddress@email.com",
-        //   "FirstName": "Amelia",
-        //   "LastName": "Sanchez",
-        //   "Password": "12345"
-        // }
         commit("updatingNPO")
         axios.patch(`http://localhost:8081/api/npos/${updatedNPO.ID}`)
             .then(response => {
-                console.log("updateNPO action response: ", response)
                 commit("updatedNPO", response.data)
             })
             .catch(error => {
@@ -107,7 +74,6 @@ export default {
         commit("deletingNPO")
         axios.delete(`http://localhost:8081/api/npos/${npoID}`)
             .then(response => {
-                console.log("deleteNPO action response: ", respone)
                 commit("deletedNPO")
 
             })

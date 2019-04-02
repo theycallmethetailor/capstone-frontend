@@ -12,7 +12,6 @@ import getters from './getters/getters'
 
 
 Vue.use(Vuex);
-console.log("This is the store actions", actions)
 export default new Vuex.Store({
   ...state,
   mutations,

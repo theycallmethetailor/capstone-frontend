@@ -370,7 +370,6 @@ export default {
     addEvent() {
       this.$refs.newEventForm.validate();
       if (this.$refs.newEventForm.validate()) {
-        // this.addingEventDialog = true;
         let eventStart = new Date(
           `${this.startDate} ${this.StartTime}:00`
         ).getTime();
@@ -385,11 +384,7 @@ export default {
           Location: this.Address,
           NumOfVolunteers: Number(this.NumOfVolunteers)
         };
-        console.log(newEvent);
         this.$store.dispatch("addEvent", { newEvent, router: this.$router });
-        // .then(() => {
-        //   if (this.addEventError) this.eventErroDialog = true;
-        // });
       }
     },
     saveStartDate(date) {

@@ -32,7 +32,7 @@ export default {
   },
   created() {
     this.$store.dispatch("getNPOs");
-    this.$store.dispatch("getEvent", this.id);
+    this.$store.dispatch("getEvent", Number(this.id));
   },
   computed: {
     event() {
