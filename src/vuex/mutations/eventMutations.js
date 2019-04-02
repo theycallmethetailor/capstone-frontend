@@ -30,6 +30,7 @@ module.exports = {
         state.fetchEventSuccess = true
         state.event = event
         state.eventToUpdate = event
+        state.eventToUpdateTags = event.Tags.map(tag => tag.TagName)
         state.eventShifts = event.Shifts
     },
     //CREATE event
@@ -93,10 +94,37 @@ module.exports = {
         state.event.Location = updatedEvent.Location
         state.event.NumOfVolunteers = updatedEvent.NumOfVolunteers
     },
+    updateEventToUpdate(state, eventToUpdate) {
+        state.eventToUpdate.Name = eventToUpdate.Name
+        state.eventToUpdate.Description = eventToUpdate.Description
+        state.eventToUpdate.NumOfVolunteers = eventToUpdate.NumOfVolunteers
+        state.eventToUpdate.Tags = eventToUpdate.Tags
+        state.eventToUpdate.StartTime = eventToUpdate.StartTime
+    },
     resetUpdateEventSuccess(state) {
         state.updateEventSuccess = !state.updateEventSuccess
     },
     resetUpdateEventError(state) {
         state.resetUpdateEventError = !state.resetUpdateEventError
-    }
+    },
+    //DELETE Event
+    deletingEvent(state) {
+        state.deleteEventSuccess = false
+        state.deleteEventError = false
+        state.deletingEvent = true
+    },
+    deleteEventError(state) {
+        state.deletingEvent = false
+        state.deleteEventError = true
+    },
+    deletedEvent(state, deletedEventID) {
+        state.deletingEvent = false
+        state.deleteEventSuccess = true
+        state.openEvents = state.openEvents.map(event => {
+            event.ID !== deletedEventID
+        })
+    },
+    resetDeleteEventSuccess(state) {
+        state.deleteEventSuccess = !state.deleteEventSuccess
+    },
 }

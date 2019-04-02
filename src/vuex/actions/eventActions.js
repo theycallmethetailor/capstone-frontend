@@ -100,4 +100,17 @@ export default {
                 commit("updateEventError")
             })
     },
+    //DELETE Event
+    deleteEvent({ commit }, eventID) {
+        commit("deletingEvent")
+        axios.delete(`http://localhost:8081/api/events/delete/${eventID}`)
+            .then(response => {
+                console.log("deleteEvent response: ", response)
+                commit("deletedEvent", response)
+            })
+            .catch(error => {
+                console.error("deleteEvent action error: ", error)
+                commit("deleteEventError")
+            })
+    }
 }

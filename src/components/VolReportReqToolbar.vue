@@ -7,6 +7,7 @@
         tabs
         >  
             <template >
+
                 <v-layout justify-space-around wrap>
                     <!-- Start Date Constraint -->
                         <v-flex
@@ -83,10 +84,20 @@
                             </v-date-picker>
                             </v-dialog>
                         </v-flex>
+                        <v-flex
+                        xs12
+                        sm12
+                        md12
+                        lg3
+                        xl3
+                        >
+
+                        <v-btn color="primary" :loading="fetchingVolReport" @click="fetchReport">
+                            Request Report
+                        </v-btn>
+
+                        </v-flex>
                 </v-layout>
-                <v-btn color="primary" :loading="fetchingVolReport" @click="fetchReport">
-                    Request Report
-                </v-btn>
             </template>
         </v-container>
 

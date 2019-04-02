@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title 
-        class="primary white--text" 
+        class="primary headline white--text" 
         primary-title
         >
         Login
@@ -84,7 +84,8 @@ export default {
       Email: "",
       emailRules: [
         v => !!v || "E-mail is required",
-        v => /.+@.+/.test(v) || "E-mail must be valid"
+        v => /.+@.+/.test(v) || "E-mail must be valid",
+        v => v.includes(".") || "E-mail must be valid"
       ],
       Password: "",
       showPass: false,

@@ -20,4 +20,8 @@ export default {
     updatingEvent: false,
     updateEventError: false,
     updateEventSuccess: false,
+    //DELETE event
+    deletingEvent: false,
+    deleteEventError: false,
+    deleteEventSuccess: false,
 }

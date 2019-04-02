@@ -29,4 +29,8 @@ export default {
     cancelingShift: false,
     cancelShiftError: false,
     cancelShiftSuccess: false,
+    //UPDATE Shift - Volunteer Shift Confirm
+    confirmingShift: false,
+    confirmShiftError: false,
+    confirmShiftSuccess: false,
 }

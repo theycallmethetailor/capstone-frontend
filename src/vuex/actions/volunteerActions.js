@@ -132,4 +132,20 @@ export default {
                 commit("cancelShiftError")
             })
     },
+    //Volunteer Shift confirm 
+    volConfirmShift({ commit }, confirmObj) {
+        commit("confirmingShift")
+        let shiftID = confirmObj.ID
+        let updatedShift = {
+            VolunteerID: confirmObj.VolunteerID
+        }
+        axios.patch(`http://localhost:8081/api/confirm/shifts/${shiftID}`, updatedShift)
+            .then(response => {
+                commit("confirmedShift", response.data)
+                confirmObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)
+            })
+            .catch(error => {
+                commit("confirmShiftError")
+            })
+    }
 }

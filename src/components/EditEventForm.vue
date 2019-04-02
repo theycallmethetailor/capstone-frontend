@@ -34,6 +34,30 @@
                     >
                     There was an error saving your changes.
                     </v-alert>
+                    <!-- Deleted success -->
+                    <v-alert
+                    v-model="deleteEventSuccess"
+                    dismissible
+                    mode="out-in"
+                    transition="slide-x-transition"
+                    color="success"
+                    icon="check_circle"
+                    outline
+                    >
+                    Your event was deleted successfully.
+                    </v-alert>
+                    <!-- Deleted error -->
+                    <v-alert
+                    v-model="deleteEventError"
+                    dismissible
+                    mode="out-in"
+                    transition="slide-x-transition"
+                    color="error"
+                    icon="warning"
+                    outline
+                    >
+                    There was an error saving your changes.
+                    </v-alert>
                 </v-flex>
             </v-layout>
 
@@ -181,7 +205,7 @@
                       >
                         <v-spacer></v-spacer>
                         <v-btn flat color="primary" @click="startDateModal = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.dialogStart.save(startDate)">OK</v-btn>
+                        <v-btn flat color="primary" @click="handleStartDateChange(startDate, Tags)">OK</v-btn>
                       </v-date-picker>
                     </v-dialog>
                   </v-flex>
@@ -214,7 +238,7 @@
                       >
                         <v-spacer></v-spacer>
                         <v-btn flat color="primary" @click="startTimeModal = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.startTimeDialog.save(StartTime)">OK</v-btn>
+                        <v-btn flat color="primary" @click="handleStartTimeChange(StartTime, Tags)">OK</v-btn>
                       </v-time-picker>
                     </v-dialog>
                   </v-flex>
@@ -255,7 +279,7 @@
                       >
                         <v-spacer></v-spacer>
                         <v-btn flat color="primary" @click="endDateModal = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.dialogEnd.save(endDate)">OK</v-btn>
+                        <v-btn flat color="primary" @click="handleEndDateChange(endDate, Tags)">OK</v-btn>
                       </v-date-picker>
                     </v-dialog>
                   </v-flex>
@@ -289,7 +313,7 @@
                       >
                         <v-spacer></v-spacer>
                         <v-btn flat color="primary" @click="endTimeModal = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.endTimeDialog.save(EndTime)">OK</v-btn>
+                        <v-btn flat color="primary" @click="handleEndTimeChange(EndTime, Tags)">OK</v-btn>
                       </v-time-picker>
                     </v-dialog>
                   </v-flex>
@@ -298,20 +322,74 @@
               <!-- Submit Button -->
               <v-btn
               :loading="updatingEvent || fetchingEvent"
-              :disabled="!valid" 
+              :disabled="!valid || deletingEvent" 
               color="primary"
               @click="updateEvent"
               >
                 Save Changes
               </v-btn>
               <v-btn
+              :disabled="deletingEvent"
               :loading="updatingEvent"
                 @click="goToEvent"
               >
                   View Event
               </v-btn>
+
+                <v-btn
+                color="error"
+                :disabled="updatingEvent"
+                @click="confirmDeleteDialog = true"
+                >
+                    Delete Event
+                </v-btn>
+
             </v-form>
         </v-card-text>
+
+        <!-- Confirm Delete Dialog -->
+        <template>
+          <div class="text-xs-center">
+            <v-dialog
+              v-model="confirmDeleteDialog"
+              width="500"
+            >
+              <v-card>
+                <v-card-title
+                  class="headline primary white--text"
+                  primary-title
+                >
+                  Confirm Delete
+                </v-card-title>
+
+                <v-card-text>
+                  Are you sure you want to delete this event? Clicking "Confirm" will permanently delete this event.
+                </v-card-text>
+
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    :loading="deletingEvent"
+                    color="error"
+                    flat
+                    @click="deleteEvent"
+                  >
+                    Confirm
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    flat
+                    @click="confirmDeleteDialog = false"
+                  >
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+        </template>
 
         <!-- Adding Event Status Card -->
         <v-dialog
@@ -333,8 +411,8 @@ export default {
   components: {
     AddingEventsStatusCard
   },
-  created() {
-    this.$store.dispatch("getEvent");
+  mounted() {
+    this.$store.dispatch("getEvent", Number(this.eventID));
     this.$store.dispatch("getAllTags");
     this.$store.dispatch("getOneNPO", Number(this.loggedInNPOID));
   },
@@ -343,6 +421,7 @@ export default {
       valid: false,
       NPOID: this.npoID,
       eventErroDialog: false,
+      confirmDeleteDialog: false,
       nameRules: [
         v => !!v || "Event Name is required",
         v => (v && v.length <= 25) || "Name must be less than 25 characters"
@@ -401,6 +480,101 @@ export default {
     };
   },
   methods: {
+    deleteEvent() {
+      this.confirmDeleteDialog = false;
+      this.$store.dispatch("deleteEvent", Number(this.event.ID));
+    },
+    handleStartTimeChange(val, tags) {
+      let eventStart = new Date(`${this.startDate} ${val}:00`).getTime();
+      let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
+      let updatedEvent = {
+        ID: this.event.ID,
+        NPOID: this.loggedInNPOID,
+        Name: this.Name,
+        StartTime: eventStart,
+        EndTime: eventEnd,
+        Tags: tags.map(tag => {
+          return {
+            TagName: tag
+          };
+        }),
+        Description: this.Description,
+        Location: this.Address,
+        NumOfVolunteers: Number(this.NumOfVolunteers)
+      };
+      this.$store.commit("updateEventToUpdate", updatedEvent);
+      this.$refs.startTimeDialog.save(val);
+    },
+    handleEndTimeChange(val, tags) {
+      let eventStart = new Date(
+        `${this.startDate} ${this.StartTime}:00`
+      ).getTime();
+      let eventEnd = new Date(`${this.endDate} ${val}:00`).getTime();
+      let updatedEvent = {
+        ID: this.event.ID,
+        NPOID: this.loggedInNPOID,
+        Name: this.Name,
+        StartTime: eventStart,
+        EndTime: eventEnd,
+        Tags: tags.map(tag => {
+          return {
+            TagName: tag
+          };
+        }),
+        Description: this.Description,
+        Location: this.Address,
+        NumOfVolunteers: Number(this.NumOfVolunteers)
+      };
+
+      this.$store.commit("updateEventToUpdate", updatedEvent);
+      this.$refs.endTimeDialog.save(val);
+    },
+    handleStartDateChange(val, tags) {
+      let eventStart = new Date(`${val} ${this.StartTime}:00`).getTime();
+      let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
+      let updatedEvent = {
+        ID: this.event.ID,
+        NPOID: this.loggedInNPOID,
+        Name: this.Name,
+        StartTime: eventStart,
+        EndTime: eventEnd,
+        Tags: tags.map(tag => {
+          return {
+            TagName: tag
+          };
+        }),
+        Description: this.Description,
+        Location: this.Address,
+        NumOfVolunteers: Number(this.NumOfVolunteers)
+      };
+
+      this.$store.commit("updateEventToUpdate", updatedEvent);
+      this.$refs.dialogStart.save(val);
+    },
+    handleEndDateChange(val, tags) {
+      let eventStart = new Date(
+        `${this.startDate} ${this.StartTime}:00`
+      ).getTime();
+      let eventEnd = new Date(`${val} ${this.EndTime}:00`).getTime();
+      let updatedEvent = {
+        ID: this.event.ID,
+        NPOID: this.loggedInNPOID,
+        Name: this.Name,
+        StartTime: eventStart,
+        EndTime: eventEnd,
+        Tags: tags.map(tag => {
+          return {
+            TagName: tag
+          };
+        }),
+        Description: this.Description,
+        Location: this.Address,
+        NumOfVolunteers: Number(this.NumOfVolunteers)
+      };
+
+      this.$store.commit("updateEventToUpdate", updatedEvent);
+      this.$refs.dialogEnd.save(val);
+    },
     goToEvent() {
       this.$store.dispatch("resetAddEventSuccess");
       this.$router.push(`/event/${this.event.ID}`);
@@ -419,13 +593,14 @@ export default {
           `${this.startDate} ${this.StartTime}:00`
         ).getTime();
         let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
+        let newTags = this.Tags.map(tag => tag);
         let updatedEvent = {
           ID: this.event.ID,
           NPOID: this.loggedInNPOID,
           Name: this.Name,
           StartTime: eventStart,
           EndTime: eventEnd,
-          Tags: this.Tags,
+          Tags: newTags,
           Description: this.Description,
           Location: this.Address,
           NumOfVolunteers: Number(this.NumOfVolunteers)
@@ -448,6 +623,15 @@ export default {
     }
   },
   computed: {
+    deletingEvent() {
+      return this.$store.state.deletingEvent;
+    },
+    deleteEventError() {
+      return this.$store.state.deleteEventError;
+    },
+    deleteEventSuccess() {
+      return this.$store.state.deleteEventSuccess;
+    },
     event() {
       return this.$store.state.event;
     },
@@ -459,7 +643,22 @@ export default {
         return this.event.Name;
       },
       set(val) {
-        this.$store.state.eventToUpdate.Name = val;
+        let eventStart = new Date(
+          `${this.startDate} ${this.StartTime}:00`
+        ).getTime();
+        let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
+        let updatedEvent = {
+          ID: this.event.ID,
+          NPOID: this.loggedInNPOID,
+          Name: val,
+          StartTime: eventStart,
+          EndTime: eventEnd,
+          Tags: this.Tags,
+          Description: this.Description,
+          Location: this.Address,
+          NumOfVolunteers: Number(this.NumOfVolunteers)
+        };
+        this.$store.commit("updateEventToUpdate", updatedEvent);
       }
     },
     Description: {
@@ -467,7 +666,22 @@ export default {
         return this.event.Description;
       },
       set(val) {
-        this.$store.state.eventToUpdate.Description = val;
+        let eventStart = new Date(
+          `${this.startDate} ${this.StartTime}:00`
+        ).getTime();
+        let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
+        let updatedEvent = {
+          ID: this.event.ID,
+          NPOID: this.loggedInNPOID,
+          Name: this.Name,
+          StartTime: eventStart,
+          EndTime: eventEnd,
+          Tags: this.Tags,
+          Description: val,
+          Location: this.Address,
+          NumOfVolunteers: Number(this.NumOfVolunteers)
+        };
+        this.$store.commit("updateEventToUpdate", updatedEvent);
       }
     },
     NumOfVolunteers: {
@@ -475,7 +689,22 @@ export default {
         return this.event.NumOfVolunteers;
       },
       set(val) {
-        this.$store.state.eventToUpdate.NumOfVolunteers = val;
+        let eventStart = new Date(
+          `${this.startDate} ${this.StartTime}:00`
+        ).getTime();
+        let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
+        let updatedEvent = {
+          ID: this.event.ID,
+          NPOID: this.loggedInNPOID,
+          Name: this.Name,
+          StartTime: eventStart,
+          EndTime: eventEnd,
+          Tags: this.Tags,
+          Description: this.Description,
+          Location: this.Address,
+          NumOfVolunteers: Number(val)
+        };
+        this.$store.commit("updateEventToUpdate", updatedEvent);
       }
     },
     Address: {
@@ -491,20 +720,60 @@ export default {
         return this.event.Tags.map(tag => tag.TagName);
       },
       set(val) {
-        this.$store.state.eventToUpdate.Tags = val;
+        let updatedTags = val.map(tag => {
+          return {
+            TagName: tag
+          };
+        });
+        let eventStart = new Date(
+          `${this.startDate} ${this.StartTime}:00`
+        ).getTime();
+        let eventEnd = new Date(`${this.endDate} ${this.EndTime}:00`).getTime();
+        let updatedEvent = {
+          ID: this.event.ID,
+          NPOID: this.loggedInNPOID,
+          Name: this.Name,
+          StartTime: eventStart,
+          EndTime: eventEnd,
+          Tags: updatedTags,
+          Description: this.Description,
+          Location: this.Address,
+          NumOfVolunteers: Number(this.NumOfVolunteers)
+        };
+        this.$store.commit("updateEventToUpdate", updatedEvent);
       }
     },
-    StartTime() {
-      return moment(this.event.StartTime).format("HH:mm");
+    StartTime: {
+      get() {
+        return moment(this.event.StartTime).format("HH:mm");
+      },
+      set(val) {
+        this.handleStartTimeChange(val, this.Tags);
+      }
     },
-    EndTime() {
-      return moment(this.event.EndTime).format("HH:mm");
+    EndTime: {
+      get() {
+        return moment(this.event.EndTime).format("HH:mm");
+      },
+      set(val) {
+        this.handleEndTimeChange(val, this.Tags);
+      }
     },
-    startDate() {
-      return moment(this.event.StartTime).format("YYYY-MM-DD");
+    startDate: {
+      get() {
+        return moment(this.event.StartTime).format("YYYY-MM-DD");
+      },
+      set(val) {
+        this.handleStartDateChange(val, this.Tags);
+      }
     },
-    endDate() {
-      return moment(this.event.EndTime).format("YYYY-MM-DD");
+    endDate: {
+      get() {
+        return moment(this.event.EndTime).format("YYYY-MM-DD");
+      },
+      set(val) {
+        this.handleEndDateChange(val, this.Tags);
+      }
     },
     fetchingEvent() {
       return this.$store.state.fetchingEvent;

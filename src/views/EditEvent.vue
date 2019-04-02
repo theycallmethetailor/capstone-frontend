@@ -16,15 +16,15 @@ export default {
   components: {
     EditEventForm
   },
-  created() {
-    this.$store.dispatch("getEvent", Number(this.eventID));
-  },
   computed: {
     numberNPOID() {
       return Number(this.npoID);
     },
     numberEventID() {
       return Number(this.eventID);
+    },
+    fetchingEvent() {
+      return this.$store.state.fetchingEvent;
     }
   }
 };

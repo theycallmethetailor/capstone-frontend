@@ -23,7 +23,7 @@ Vue.use(VuetifyGoogleAutocomplete, {
 
 Vue.use(Vuetify, {
   theme: {
-    primary: colors.teal.lighten1,
+    primary: colors.cyan.darken3,
     secondary: colors.teal.lighten3,
     accent: "#FF8A80",
     error: colors.red.accent3

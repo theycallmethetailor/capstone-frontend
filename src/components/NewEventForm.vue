@@ -363,7 +363,7 @@ export default {
   },
   methods: {
     getAddressData: function(addressData, placeResultData, id) {
-      if (placeResultData.formatted_address) {
+      if (placeResultData && placeResultData.formatted_address) {
         this.Address = placeResultData.formatted_address;
       }
     },

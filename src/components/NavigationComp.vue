@@ -5,8 +5,15 @@
     <v-spacer></v-spacer>
     <v-toolbar-items class="hidden-sm-and-down">
       <v-btn class="white--text" to="/" flat>Home</v-btn>
-      <v-btn class="white--text" to="/about" flat>About</v-btn>
-      <v-btn v-if="userLoggedIn" class="white--text" :to="calendarPath" flat>My calendar</v-btn>      
+      <v-btn v-if="userLoggedIn" class="white--text" :to="calendarPath" flat>
+          <span v-if="!unconfirmedVolunteerEvents" >My Calendar</span>
+                <v-badge right color="accent" v-model="unconfirmedVolunteerEvents" >
+                  <template v-slot:badge>
+                    <span>{{unconfirmedVolunteerEvents}}</span>
+                  </template>
+                  <span>My Calendar</span>
+                </v-badge>
+      </v-btn>      
       <v-btn v-if="volunteerLoggedIn" class="white--text" :to="'/volunteer/report/' + volunteerID" flat>My Hours</v-btn>      
       <v-btn v-if="!userLoggedIn" class="white--text" to='/login' flat>Sign In/Sign Up </v-btn>
       <v-btn v-if="userLoggedIn" @click="logout" class="white--text" flat>Logout</v-btn>
@@ -33,6 +40,9 @@ export default {
     }
   },
   computed: {
+    now() {
+      return new Date().getTime();
+    },
     userLoggedIn: {
       get() {
         console.log("userLoggedIn getter: ", this.$store.state.loggedInUserID);
@@ -45,6 +55,11 @@ export default {
         };
         this.$store.commit("logout", necObj);
       }
+    },
+    unconfirmedVolunteerEvents() {
+      return this.$store.state.volunteerShifts.filter(shift => {
+        return shift.WasWorked && shift.ActualEndTime < this.now;
+      }).length;
     },
     volunteerLoggedIn() {
       return (

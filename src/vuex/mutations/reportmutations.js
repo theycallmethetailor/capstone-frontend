@@ -20,6 +20,6 @@ export default {
         state.reportStartDate = newStartDate
     },
     updateReportEndDate(state, newEndDate) {
-        state.reportStartDate = newEndDate
+        state.reportEndDate = newEndDate
     }
 }

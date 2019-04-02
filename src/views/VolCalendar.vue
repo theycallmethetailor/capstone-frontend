@@ -52,8 +52,21 @@
                     v-ripple
                     class="my-event"
                     v-on="on"
-                    v-html="calEvent.EventName"
-                  ></div>
+                  >
+                  <span v-if="calEvent.ActualEndTime > new Date().getTime()" >{{ calEvent.EventName + ' ' + moment(calEvent.ActualStartTime).format('h:mm a') }} </span>
+                  
+                <v-badge alt="You have unconfirmed shifts that have passed." right color="primary" v-if="calEvent.ActualEndTime < new Date().getTime() && !calEvent.WasWorked" >
+                  <template v-slot:badge>
+                    <v-icon
+                      class="white--text"
+                      small
+                    >
+                      notifications
+                    </v-icon>
+                  </template>
+                  <span>{{ calEvent.EventName + ' ' + moment(calEvent.ActualStartTime).format('h:mm a') }}</span>
+                </v-badge>
+                  </div>
                 </template>
                 <v-card
                   color="grey lighten-4"

@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title 
-        class="primary white--text" 
+        class="primary headline white--text" 
         primary-title
         >
         Register
@@ -107,13 +107,36 @@
                     ></v-text-field>
                   </v-flex>
               </v-layout>
-              <v-btn
-             :disabled="!volunteerFormValid"
-              color="primary"
-              @click="register"
-              >
-                  Register as a {{ userType === "NPO" ? "Non Profit Organization" : "Volunteer" }}
-              </v-btn>
+            <!-- Confirm Password -->
+              <v-layout justify-space-around>
+                  <v-flex xs12 sm11 md11 xl11>
+                    <v-text-field
+                        v-model="ConfirmPassword"
+                        :prepend-icon="showPass ? 'visibility' : 'visibility_off'"
+                        :rules="confirmPassRules"
+                        :type="showPass ? 'text' : 'password'"
+                        name="input-10-1"
+                        :label="userType === 'NPO' ? 'Confirm Password' : 'Confirm Password'"
+                        hint="At least 8 characters"
+                        counter
+                        @click:prepend="showPass = !showPass"
+                    ></v-text-field>
+                  </v-flex>
+              </v-layout>
+              <v-container>
+                <v-layout>
+                  <v-flex>
+                    <v-btn
+                  :disabled="!volunteerFormValid"
+                    color="primary"
+                    @click="register"
+                    >
+                        Register as a {{ userType === "NPO" ? "Non Profit Organization" : "Volunteer" }}
+                    </v-btn>
+
+                  </v-flex>
+                </v-layout>
+              </v-container>
             </v-form>
 
             <!-- NPO Registration form  -->
@@ -216,13 +239,35 @@
                     ></v-text-field>
                   </v-flex>
               </v-layout>
-              <v-btn
-             :disabled="!npoFormValid"
-              color="primary"
-              @click="register"
-              >
-                  Register as a {{ userType === "NPO" ? "Non Profit Organization" : "Volunteer" }}
-              </v-btn>
+            <!-- Confirm Password -->
+              <v-layout justify-space-around>
+                  <v-flex xs12 sm11 md11 xl11>
+                    <v-text-field
+                        v-model="ConfirmPassword"
+                        :prepend-icon="showPass ? 'visibility' : 'visibility_off'"
+                        :rules="confirmPassRules"
+                        :type="showPass ? 'text' : 'password'"
+                        name="input-10-1"
+                        :label="userType === 'NPO' ? 'Confirm Password' : 'Confirm Password'"
+                        hint="At least 8 characters"
+                        counter
+                        @click:prepend="showPass = !showPass"
+                    ></v-text-field>
+                  </v-flex>
+              </v-layout>
+              <v-container>
+                <v-layout>
+                  <v-flex>
+                    <v-btn
+                  :disabled="!npoFormValid"
+                    color="primary"
+                    @click="register"
+                    >
+                        Register as a {{ userType === "NPO" ? "Non Profit Organization" : "Volunteer" }}
+                    </v-btn>
+                  </v-flex>
+                </v-layout>
+              </v-container>
             </v-form>
         </v-card-text>
     </v-card>
@@ -242,7 +287,8 @@ export default {
       Email: "",
       emailRules: [
         v => !!v || "E-mail is required",
-        v => /.+@.+/.test(v) || "E-mail must be valid"
+        v => /.+@.+/.test(v) || "E-mail must be valid",
+        v => v.includes(".") || "E-mail must be valid"
       ],
       Password: "",
       showPass: false,
@@ -273,6 +319,11 @@ export default {
       Description: "",
       descriptionRules: [
         v => v.length < 1000 || "Bio must be less than 1000 characters."
+      ],
+      ConfirmPassword: "",
+      confirmPassRules: [
+        v => !!v || "Please confirm password",
+        v => v === this.Password || "Passwords must match"
       ]
     };
   },

@@ -5,7 +5,7 @@
     min-height="20vh"
     >
         <v-card-title 
-        class="primary white--text" 
+        class="primary headline white--text" 
         primary-title
         @click="goToEvent"
         >
@@ -14,12 +14,20 @@
        
         <v-card-text>
         <v-alert
-          :value="volIsSignedUp"
+          :value="volIsSignedUp && !volunteerNeedsToConfirmShift"
           color="info"
           icon="info"
           outline
         >
           You are already signed up for this shift.
+        </v-alert>
+        <v-alert
+          :value="volunteerNeedsToConfirmShift"
+          color="info"
+          icon="info"
+          outline
+        >
+          This event has passed. Please confirm you've worked this shift by clicking the "Confirm Shift" button below. 
         </v-alert>
             <h4> <v-icon left >event</v-icon>  {{ startDateRead }} to {{ endDateRead }} </h4>
             <v-btn
@@ -95,7 +103,8 @@
             <v-btn v-if="!eventView" @click="goToEvent" flat color="primary">View Event</v-btn>
             <v-btn v-if="eventView && volunteerLoggedIn && !!firstOpenShift && !volIsSignedUp" @click="volSignUp" flat color="primary">Sign Up</v-btn>
             <v-btn v-if="eventView && !volunteerLoggedIn && !npoLoggedIn" to="/login" >Sign Up</v-btn>
-            <v-btn v-if="eventView && volunteerLoggedIn  && volIsSignedUp" @click="volCancelShift" flat color="error">Cancel Shift</v-btn>
+            <v-btn v-if="eventView && volunteerLoggedIn  && volIsSignedUp && !volunteerNeedsToConfirmShift" @click="volCancelShift" flat color="error">Cancel Shift</v-btn>
+            <v-btn v-if="eventView && volunteerNeedsToConfirmShift" color="primary" @click="volConfirmShift" > Confirm Shift </v-btn>
             <v-btn v-if="eventView && isLoggedInNPOsEvent" :to="'/event/edit/' + event.ID + '/' + event.NPOID" >Edit Event</v-btn>
 
         </v-card-actions>
@@ -148,6 +157,26 @@ export default {
   //   }
   // },
   computed: {
+    now() {
+      return new Date().getTime();
+    },
+    eventHasPassed() {
+      return this.event.EndTime < this.now;
+    },
+    volunteersShift() {
+      if (this.volunteerLoggedIn && this.volIsSignedUp) {
+        return this.event.Shifts.filter(
+          shift => Number(shift.VolunteerID) === Number(this.volunteerID)
+        )[0];
+      } else {
+        return [];
+      }
+    },
+    volunteerNeedsToConfirmShift() {
+      if (this.volunteersShift) {
+        return this.volunteersShift.WasWorked === false && this.eventHasPassed;
+      }
+    },
     loggedInUserRole() {
       return this.$store.state.loggedInUserRole;
     },
@@ -229,6 +258,14 @@ export default {
     }
   },
   methods: {
+    volConfirmShift() {
+      let signupObj = {
+        ID: this.firstOpenShift.ID,
+        VolunteerID: this.volunteerID,
+        router: this.$router
+      };
+      this.$store.dispatch("volConfirmShift", signupObj);
+    },
     volSignUp() {
       let signupObj = {
         ID: this.firstOpenShift.ID,

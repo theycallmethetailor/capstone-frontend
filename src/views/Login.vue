@@ -33,10 +33,6 @@
                 </v-card>
               </v-tab-item>
             </v-tabs>
-
-            <div class="text-xs-center mt-3">
-              <v-btn @click="next">next tab</v-btn>
-            </div>
           </div>
         </template>
       </v-flex>

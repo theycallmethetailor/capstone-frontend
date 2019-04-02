@@ -13,6 +13,7 @@ export default {
         state.fetchingVolunteer = false
         state.fetchVolunteerSuccess = true
         state.volunteer = volunteer
+        state.volunteerShifts = volunteer.Shifts
     },
     //CREATE Volunteer
     addingVolunteer(state) {
@@ -112,7 +113,27 @@ export default {
         state.cancelShiftSuccess = true
         state.volunteerShifts = state.volunteerShifts.filter(shift => {
             // shift.VolunteerID !== state.volunteer.ID
-            return shift.VolunteerID !== 9
+            return shift.VolunteerID !== cancelledShift.VolunteerID
         })
     },
+    //UPDATE Shift - Volunteer Confirm shift
+    confirmingShift(state) {
+        state.confirmShiftError = false
+        state.confirmShiftSuccess = false
+        state.confirmingShift = true
+    },
+    confirmShiftError(state) {
+        state.confirmingShift = false
+        state.confirmShiftError = false
+    },
+    confirmedShift(state, confirmedShift) {
+        state.confirmingShift = false
+        state.confirmShiftSuccess = true
+        state.volunteerShifts = state.volunteerShifts.map(shift => {
+            if (shift.VolunteerID !== confirmedShift.VolunteerID) {
+                shift.WasWorked = confirmedShift.WasWorked
+            }
+            return shift
+        })
+    }
 }
