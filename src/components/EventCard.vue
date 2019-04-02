@@ -163,6 +163,9 @@ export default {
     if (this.$ls.get("user_type") === "Volunteer") {
       this.$store.dispatch("getVolunteer", Number(this.$ls.get("id")));
     }
+    if (this.$ls.get("user_type") === "Volunteer") {
+      this.$store.dispatch("getAllVolunteerShifts", Number(this.$ls.get("id")));
+    }
   },
   // async mounted() {
   //   try {
@@ -209,10 +212,10 @@ export default {
       if (this.volunteerLoggedIn) {
         return !!this.$store.state.volunteerShifts.filter(shift => {
           return (
-            shift.ActualStartTime >= this.event.StartTime ||
+            shift.ActualStartTime >= this.event.StartTime &&
             shift.ActualStartTime <= this.event.EndTime
           );
-        });
+        }).length;
       }
     },
     loggedInUserRole() {
@@ -236,18 +239,17 @@ export default {
       );
     },
     volunteerID() {
-      return this.volunteerLoggedIn ? this.$store.state.loggedInUserID : null;
+      return this.volunteerLoggedIn ? this.$ls.get("id") : null;
     },
     npoID() {
       return this.npoLoggedIn ? this.$store.state.loggedInUserID : null;
     },
     volIsSignedUp() {
-      if (
-        this.event.Shifts &&
-        this.$store.state.loggedInUserRole === "Volunteer"
-      ) {
+      if (this.event.Shifts && this.$ls.get("user_type") === "Volunteer") {
         return !!this.event.Shifts.filter(
-          shift => Number(shift.VolunteerID) === Number(this.volunteerID)
+          shift =>
+            Number(shift.VolunteerID) ===
+            Number(this.$store.state.loggedInUserID)
         ).length;
       }
     },
@@ -299,7 +301,7 @@ export default {
     volConfirmShift() {
       let signupObj = {
         ID: this.firstOpenShift.ID,
-        VolunteerID: this.volunteerID,
+        VolunteerID: Number(this.volunteerID),
         router: this.$router
       };
       this.$store.dispatch("volConfirmShift", signupObj);
@@ -307,7 +309,7 @@ export default {
     volSignUp() {
       let signupObj = {
         ID: this.firstOpenShift.ID,
-        VolunteerID: this.volunteerID,
+        VolunteerID: Number(this.volunteerID),
         router: this.$router
       };
       this.$store.dispatch("signUpForShift", signupObj);
@@ -315,9 +317,9 @@ export default {
     volCancelShift() {
       let cancelOb = {
         ID: this.event.Shifts.find(
-          event => event.VolunteerID === this.volunteerID
+          event => event.VolunteerID === Number(this.volunteerID)
         ).ID,
-        VolunteerID: this.volunteerID,
+        VolunteerID: Number(this.volunteerID),
         router: this.$router
       };
       this.$store.dispatch("cancelShift", cancelOb);

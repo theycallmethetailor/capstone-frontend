@@ -95,8 +95,8 @@ export default {
         state.signUpShiftSuccess = true
         state.volunteerShifts.push(newShift)
     },
-    resetVolSignupSuccess() {
-        this.state.signUpShiftSuccess = false
+    resetVolSignupSuccess(state) {
+        state.signUpShiftSuccess = false
     },
     //UPDATE Shift - Volunteer cancel
     cancelingShift(state) {

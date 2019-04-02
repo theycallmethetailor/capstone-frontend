@@ -88,6 +88,7 @@
                   </v-card-text>
                   <v-card-actions>
                     <v-btn
+                      v-if="!eventView"
                       flat
                       color="primary"
                       @click="$router.push(`/event/${calEvent.EventID}`)"

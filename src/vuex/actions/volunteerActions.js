@@ -67,9 +67,9 @@ export default {
             })
     },
     //READ Volunteer Shifts
-    getAllVolunteerShifts({ commit }, volunteer) {
+    getAllVolunteerShifts({ commit }, volunteerID) {
         commit("fetchingVolShifts")
-        axios.get(`http://localhost:8081/api/shifts/volunteers/${volunteer.ID}`)
+        axios.get(`http://localhost:8081/api/shifts/volunteers/${volunteerID}`)
             .then(response => {
                 commit("fetchedVolShifts", response.data)
             })
@@ -103,8 +103,10 @@ export default {
         let updatedShift = {
             VolunteerID: cancelObj.VolunteerID
         }
+        console.log("updatedShift: ", updatedShift)
         axios.patch(`http://localhost:8081/api/cancel/shifts/${shiftID}`, updatedShift)
             .then(response => {
+                console.log("response: ", response)
                 commit("canceledShift", response.data)
                 cancelObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)
             })
