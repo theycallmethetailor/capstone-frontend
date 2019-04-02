@@ -21,10 +21,10 @@
         <v-card flat>
           <v-container>
             <v-layout justify-space-around wrap>
-              <v-flex xs10 sm10 md12 lg5 xl5>
+              <v-flex xs10 sm10 md5 lg5 xl5>
                <HoursByNPOChart />
               </v-flex>
-              <v-flex xs10 sm10 md12 lg5 xl5>
+              <v-flex xs10 sm10 md5 lg5 xl5>
               <HoursByNPOPieChart/>
 
               </v-flex>
@@ -40,11 +40,11 @@
           <v-card flat>
           <v-container>
             <v-layout justify-space-around wrap>
-              <v-flex xs10 sm10 md12 lg5 xl5>
+              <v-flex xs10 sm10 md5 lg5 xl5>
                <HoursByEventChart />
               </v-flex>
 
-              <v-flex xs10 sm10 md12 lg5 xl5>
+              <v-flex xs10 sm10 md5 lg5 xl5>
                 <HoursByEventPieChart />
               </v-flex>
             </v-layout>
@@ -58,11 +58,11 @@
 
           <v-container>
             <v-layout justify-space-around wrap>
-              <v-flex xs10 sm10 md12 lg5 xl5>
+              <v-flex xs10 sm10 md5 lg5 xl5>
                <HoursByTagChart />
               </v-flex>
 
-              <v-flex xs10 sm10 md12 lg5 xl5>
+              <v-flex xs10 sm10 md5 lg5 xl5>
                 <HoursByTagPieChart />
               </v-flex>
             </v-layout>

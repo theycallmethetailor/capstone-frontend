@@ -1,6 +1,6 @@
 <template>
   <v-toolbar color="primary" class="white--text">
-    <v-toolbar-side-icon @click="toggleDrawer" class="white--text"></v-toolbar-side-icon>
+    <!-- <v-toolbar-side-icon @click="toggleDrawer" class="white--text"></v-toolbar-side-icon> -->
     <v-toolbar-title>Volunteer Connect</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items class="hidden-sm-and-down">

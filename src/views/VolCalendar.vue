@@ -31,7 +31,7 @@
     </v-alert>
     <h1>Event Calendar</h1>
     </v-container>
-      <v-sheet height="500">
+      <v-sheet v-if="!fetchingVolunteer && fetchVolunteerSuccess" height="500">
         <v-calendar
           ref="calendar"
           v-model="start"
@@ -220,6 +220,15 @@ export default {
         });
         return shiftMap;
       }
+    },
+    fetchingVolunteer() {
+      return this.$store.state.fetchingVolunteer;
+    },
+    fetchVolunteerError() {
+      return this.$store.state.fetchVolunteerError;
+    },
+    fetchVolunteerSuccess() {
+      return this.$store.state.fetchVolunteerSuccess;
     },
     cancelShiftSuccess: {
       get() {

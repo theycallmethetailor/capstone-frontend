@@ -1,6 +1,6 @@
 <template>
   <v-container grid-list-md>
-    <v-layout row wrap v-if="openEvents.length" >
+    <v-layout v-if="!fetchingEvents && openEvents.length" row wrap >
       <v-flex 
       xs12 
       md6 
