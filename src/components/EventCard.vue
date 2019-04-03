@@ -167,26 +167,26 @@ export default {
       this.$store.dispatch("getAllVolunteerShifts", Number(this.$ls.get("id")));
     }
   },
-  // async mounted() {
-  //   try {
-  //     const google = await gmapsInit();
-  //     const geocoder = new google.maps.Geocoder();
-  //     const map = new google.maps.Map(document.getElementById("map"));
+  async mounted() {
+    try {
+      const google = await gmapsInit();
+      const geocoder = new google.maps.Geocoder();
+      const map = new google.maps.Map(document.getElementById("map"));
 
-  //     geocoder.geocode({ address: this.event.Location }, (results, status) => {
-  //       if (status !== "OK" || !results[0]) {
-  //         throw new Error(status);
-  //       }
+      geocoder.geocode({ address: this.event.Location }, (results, status) => {
+        if (status !== "OK" || !results[0]) {
+          throw new Error(status);
+        }
 
-  //       map.setCenter(results[0].geometry.location);
-  //       map.fitBounds(results[0].geometry.viewport);
-  //       this.addressLatLgn.position = results[0].geometry.location;
-  //       new google.maps.Marker({ ...this.addressLatLgn, map });
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // },
+        map.setCenter(results[0].geometry.location);
+        map.fitBounds(results[0].geometry.viewport);
+        this.addressLatLgn.position = results[0].geometry.location;
+        new google.maps.Marker({ ...this.addressLatLgn, map });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
   computed: {
     now() {
       return new Date().getTime();
