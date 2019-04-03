@@ -6,13 +6,7 @@
     <v-toolbar-items class="hidden-sm-and-down">
       <v-btn class="white--text" to="/" flat>Home</v-btn>
       <v-btn v-if="userLoggedIn" class="white--text" :to="calendarPath" flat>
-          <span v-if="!unconfirmedVolunteerEvents" >My Calendar</span>
-                <v-badge right color="accent" v-model="unconfirmedVolunteerEvents" >
-                  <template v-slot:badge>
-                    <span>{{unconfirmedVolunteerEvents}}</span>
-                  </template>
-                  <span>My Calendar</span>
-                </v-badge>
+        My Calendar
       </v-btn>      
       <v-btn v-if="volunteerLoggedIn" class="white--text" :to="'/volunteer/report/' + volunteerID" flat>My Hours</v-btn>      
       <v-btn v-if="!userLoggedIn" class="white--text" to='/login' flat>Sign In/Sign Up </v-btn>
