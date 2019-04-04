@@ -1,10 +1,12 @@
 import axios from 'axios'
 import moment from 'moment'
+const basePath = 'https://evening-escarpment-53669.herokuapp.com'
+
 export default {
     //READ NPOs
     getNPOs({ commit }) {
         commit("fetchingNPOs")
-        axios.get(`http://localhost:8081/api/npos`)
+        axios.get(`${basePath}/api/npos`)
             .then(response => {
                 commit("fetchedNPOs", response.data)
             })
@@ -16,7 +18,7 @@ export default {
     //READ NPO
     getOneNPO({ commit }, npoID) {
         commit("fetchingOneNPO")
-        axios.get(`http://localhost:8081/api/npo/${npoID}`)
+        axios.get(`${basePath}/api/npo/${npoID}`)
             .then(response => {
                 let npo = response.data
                 npo.Events = npo.Events ? npo.Events.map(event => {
@@ -44,7 +46,7 @@ export default {
             UserType: newNPOObj.userType,
         }
         commit("addingNPO")
-        axios.post(`http://localhost:8081/api/npos`, newNPO)
+        axios.post(`${basePath}/api/npos`, newNPO)
             .then(response => {
                 const npoToAdd = response.data
                 npoToAdd.ls = newNPOObj.ls
@@ -59,7 +61,7 @@ export default {
     //UPDATE NPO
     updateNPO({ commit }, updatedNPO) {
         commit("updatingNPO")
-        axios.patch(`http://localhost:8081/api/npos/${updatedNPO.ID}`)
+        axios.patch(`${basePath}/api/npos/${updatedNPO.ID}`)
             .then(response => {
                 commit("updatedNPO", response.data)
             })
@@ -72,7 +74,7 @@ export default {
     deleteNPO({ commit }, npoID) {
         npoID = 3
         commit("deletingNPO")
-        axios.delete(`http://localhost:8081/api/npos/${npoID}`)
+        axios.delete(`${basePath}/api/npos/${npoID}`)
             .then(response => {
                 commit("deletedNPO")
 

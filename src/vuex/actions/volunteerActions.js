@@ -1,11 +1,13 @@
 import axios from 'axios'
 import moment from 'moment'
+const basePath = 'https://evening-escarpment-53669.herokuapp.com'
+
 
 export default {
     //READ volunteer
     getVolunteer({ commit }, volunteerID) {
         commit("fetchingVolunteer")
-        axios.get(`http://localhost:8081/api/volunteer/${volunteerID}`)
+        axios.get(`${basePath}/api/volunteer/${volunteerID}`)
             .then(response => {
                 let volunteer = response.data
                 volunteer.Shifts = volunteer.Shifts ? volunteer.Shifts.map(shift => {
@@ -34,7 +36,7 @@ export default {
             UserType: newVolunteerObj.userType,
         }
         commit("addingVolunteer")
-        axios.post(`http://localhost:8081/api/volunteers`, newVolunteer)
+        axios.post(`${basePath}/api/volunteers`, newVolunteer)
             .then(response => {
                 commit("addedVolunteer", response.data)
                 newVolunteerObj.router.push(`/volunteer/calendar/${response.data.ID}`)
@@ -45,7 +47,7 @@ export default {
     },
     updateVolunteer({ commit }, updatedVolunteer) {
         commit("updatingVolunteer")
-        axios.patch(`http://localhost:8081/api/volunteers/${updatedVolunteer.ID}`)
+        axios.patch(`${basePath}/api/volunteers/${updatedVolunteer.ID}`)
             .then(response => {
                 commit("updatedVolunteer", response.data)
             })
@@ -57,7 +59,7 @@ export default {
     //DELETE Volunteer
     deleteVolunteer({ commit }, volunteerID) {
         commit("deletingVolunteer")
-        axios.delete(`http://localhost:8081/api/volunteers/${volunteerID}`)
+        axios.delete(`${basePath}/api/volunteers/${volunteerID}`)
             .then(response => {
                 commit("deletedVolunteer")
             })
@@ -69,7 +71,7 @@ export default {
     //READ Volunteer Shifts
     getAllVolunteerShifts({ commit }, volunteerID) {
         commit("fetchingVolShifts")
-        axios.get(`http://localhost:8081/api/shifts/volunteers/${volunteerID}`)
+        axios.get(`${basePath}/api/shifts/volunteers/${volunteerID}`)
             .then(response => {
                 commit("fetchedVolShifts", response.data)
             })
@@ -85,7 +87,7 @@ export default {
         let updatedShift = {
             VolunteerID: Number(signupObj.VolunteerID)
         }
-        axios.patch(`http://localhost:8081/api/shifts/${shiftID}`, updatedShift)
+        axios.patch(`${basePath}/api/shifts/${shiftID}`, updatedShift)
             .then(response => {
                 commit("signedUpShift", response.data)
                 signupObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)
@@ -104,7 +106,7 @@ export default {
             VolunteerID: cancelObj.VolunteerID
         }
         console.log("updatedShift: ", updatedShift)
-        axios.patch(`http://localhost:8081/api/cancel/shifts/${shiftID}`, updatedShift)
+        axios.patch(`${basePath}/api/cancel/shifts/${shiftID}`, updatedShift)
             .then(response => {
                 console.log("response: ", response)
                 commit("canceledShift", response.data)
@@ -122,7 +124,7 @@ export default {
         let updatedShift = {
             VolunteerID: confirmObj.VolunteerID
         }
-        axios.patch(`http://localhost:8081/api/confirm/shifts/${shiftID}`, updatedShift)
+        axios.patch(`${basePath}/api/confirm/shifts/${shiftID}`, updatedShift)
             .then(response => {
                 commit("confirmedShift", response.data)
                 confirmObj.router.push(`/volunteer/calendar/${response.data.VolunteerID}`)

@@ -1,9 +1,10 @@
 import axios from 'axios'
+const basePath = 'https://evening-escarpment-53669.herokuapp.com'
 
 export default {
     getVolunteerReport({ commit }, reportRequest) {
         commit("fetchingVolReport")
-        axios.post('http://localhost:8081/api/vol/report', reportRequest)
+        axios.post(`${basePath}/api/vol/report`, reportRequest)
             .then(response => {
                 let report = {
                     HoursByNPO: Object.keys(response.data.HoursByNPO).map(NPOID => {

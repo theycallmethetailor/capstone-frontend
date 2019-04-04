@@ -4,6 +4,8 @@ import npoActions from './npoActions'
 import volunteerActions from './volunteerActions'
 import reportActions from './reportactions'
 
+const basePath = 'https://evening-escarpment-53669.herokuapp.com'
+
 export const actions = {
     toggleDrawer({ commit }) {
         commit("toggleDrawer")
@@ -14,7 +16,7 @@ export const actions = {
     ...reportActions,
     getAllTags({ commit }) {
         commit("fetchingTags")
-        axios.get("http://localhost:8081/api/tags")
+        axios.get('${basePath}/api/tags')
             .then(response => {
                 commit("fetchedTags", response.data)
             })
@@ -29,7 +31,7 @@ export const actions = {
             Password: user.Password,
             UserType: user.UserType,
         }
-        axios.post(`http://localhost:8081/api/login`, userAttempt)
+        axios.post(`${basePath}/api/login`, userAttempt)
             .then(response => {
                 const responseUser = response.data
                 responseUser.UserType = responseUser.NPOName ? "NPO" : "Volunteer"

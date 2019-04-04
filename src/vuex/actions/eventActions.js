@@ -1,10 +1,12 @@
 import axios from 'axios'
+const basePath = 'https://evening-escarpment-53669.herokuapp.com'
+
 
 export default {
     //READ events
     getOpenEvents({ commit }) {
         commit("fetchingEvents")
-        axios.get(`http://localhost:8081/api/open/events`)
+        axios.get(`${basePath}/api/open/events`)
             .then(response => {
                 commit("fetchedEvents", response.data)
             })
@@ -15,7 +17,7 @@ export default {
     //READ event (SHOW)
     getEvent({ commit }, eventID) {
         commit("fetchingEvent")
-        axios.get(`http://localhost:8081/api/event/${eventID}`)
+        axios.get(`${basePath}/api/event/${eventID}`)
             .then(response => {
                 commit('fetchedEvent', response.data)
             })
@@ -30,7 +32,7 @@ export default {
     //CREATE event
     addEvent({ commit }, eventData) {
         commit("addingEvent")
-        axios.post(`http://localhost:8081/api/events`, eventData.newEvent)
+        axios.post(`${basePath}/api/events`, eventData.newEvent)
             .then(response => {
                 console.table("addEvent action response: ", response)
                 commit("addedEvent", response.data)
@@ -55,7 +57,7 @@ export default {
             NumOfVolunteers: updatedEventObj.updatedEvent.NumOfVolunteers
         }
         commit("updatingEvent")
-        axios.patch(`http://localhost:8081/api/events/${updatedEvent.ID}`, updatedEvent)
+        axios.patch(`${basePath}/api/events/${updatedEvent.ID}`, updatedEvent)
             .then(response => {
                 console.table("updateEvent action response: ", response)
                 commit("updatedEvent", response.data)
@@ -69,7 +71,7 @@ export default {
     //DELETE Event
     deleteEvent({ commit }, eventID) {
         commit("deletingEvent")
-        axios.delete(`http://localhost:8081/api/events/delete/${eventID}`)
+        axios.delete(`${basePath}/api/events/delete/${eventID}`)
             .then(response => {
                 commit("deletedEvent", response)
             })
