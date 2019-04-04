@@ -1,5 +1,11 @@
 # capstone-frontend
 
+## Live Site:
+  https://volconnect.herokuapp.com/
+
+## Backend Code: 
+  https://github.com/theycallmethetailor/capstone-backend
+
 ## Project setup
 ```
 npm install
